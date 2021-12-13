@@ -1,0 +1,12 @@
+guomiaozhishu.tb_township_area
+guomiaozhishu.tb_shop_user_role
+guomiaozhishu.tb_shop_role_menu
+guomiaozhishu.tb_member_question
+guomiaozhishu.tb_member_identity
+guomiaozhishu.tb_member_icbc
+guomiaozhishu.tb_member_answer
+guomiaozhishu.tb_market_province
+guomiaozhishu.tb_market_city
+guomiaozhishu.tb_goods_tag_link
+guomiaozhishu.tb_goods_images
+guomiaozhishu.sys_china_region

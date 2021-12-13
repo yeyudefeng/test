@@ -1,0 +1,26 @@
+create table if not exists db_ads_nstc.clife_nstc_ads_deal_message_info_f ( 
+     purchase_cnt                   int                  comment '采购信息数量' 
+    ,suppery_cnt                    int                  comment '供应信息数量' 
+    ,rent_cnt                       int                  comment '车找苗信息数量' 
+    ,lease_cnt                      int                  comment '苗找车信息数量' 
+    ,purchase_release_cnt           int                  comment '采购信息发布中数量' 
+    ,suppery_release_cnt            int                  comment '供应信息发布中数量' 
+    ,rent_release_cnt               int                  comment '车找苗信息发布中数量' 
+    ,lease_release_cnt              int                  comment '苗找车信息发布中数量' 
+    ,purchase_finish_cnt            int                  comment '采购信息已结束数量' 
+    ,suppery_finish_cnt             int                  comment '供应信息已结束数量' 
+    ,rent_finish_cnt                int                  comment '车找苗信息已结束数量' 
+    ,lease_finish_cnt               int                  comment '苗找车信息已结束数量' 
+    ,purchase_return_cnt            int                  comment '采购信息被驳回数量' 
+    ,suppery_return_cnt             int                  comment '供应信息被驳回数量' 
+    ,rent_return_cnt                int                  comment '车找苗信息被驳回数量' 
+    ,lease_return_cnt               int                  comment '苗找车信息被驳回数量' 
+    ,purchase_scan_num              int                  comment '采购信息浏览量' 
+    ,suppery_scan_num               int                  comment '供应信息浏览量' 
+    ,rent_scan_num                  int                  comment '车找苗信息浏览量' 
+    ,lease_scan_num                 int                  comment '苗找车信息浏览量' 
+) comment '买卖信息累计应用表' 
+partitioned by (  part_date string  ) 
+row format delimited fields terminated by '\t' 
+stored as parquet 
+;

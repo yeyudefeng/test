@@ -1,0 +1,698 @@
+==================
+db_campus_education.tb_class
+==================
+select 
+    ,class_id                       -- 班级id
+    ,class_no                       -- 班级编号
+    ,class_name                     -- 班级名称
+    ,grade_id                       -- 年级id
+    ,grade_name                     -- 年级名称
+    ,org_id                         -- 学校id
+    ,status                         -- 班级状态（0-失效 1-正常 2-毕业）
+    ,enter_school_year              -- 入学年份
+    ,leave_date                     -- 毕业离园日期
+    ,graduation_time                -- 毕业处理时间
+    ,create_time                    -- 添加时间
+    ,update_time                    -- 修改时间
+from db_campus_education.tb_class
+
+
+==================
+db_campus_education.tb_grade
+==================
+select 
+    ,data_id                        -- 自增id
+    ,grade_id                       -- 年级id
+    ,org_id                         -- 学校id
+    ,grade_name                     -- 年级名称
+    ,grade_order                    -- 年级排序
+    ,create_time                    -- 添加时间
+    ,update_time                    -- 修改时间
+from db_campus_education.tb_grade
+
+
+==================
+db_campus_education.tb_org
+==================
+select 
+    ,org_id                         -- 机构id
+    ,org_name                       -- 机构名称
+    ,org_name_en                    -- 机构英文名
+    ,domain_name                    -- 机构专属域名
+    ,admin_user_id                  -- 机构管理员的用户id
+    ,parent_id                      -- 上级机构id,0表示没有上级机构
+    ,org_type                       -- 机构类型( 1:教育局 2:教育集团 3:幼儿园)
+    ,grade_ids                      -- 幼儿园开设年级,以英文逗号隔开
+    ,org_code                       -- 机构代码
+    ,status                         -- 状态(-1:未开始 0:停用 1：正常 2：过期)
+    ,deleted                        -- 删除状态 0已删除 1正常
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 更新时间
+    ,start_date                     -- 使用期限的开始时间
+    ,end_date                       -- 使用期限的结束时间
+    ,logo                           -- logo图标路径
+    ,province_id                    -- 省份id
+    ,city_id                        -- 城市id
+    ,area_id                        -- 区县id
+    ,town_id                        -- 乡镇id
+    ,village_id                     -- 村id
+    ,province_city_area             -- 省市区
+    ,address                        -- 详细地址
+    ,fixed_tel_area_num             -- 固定电话-区号
+    ,fixed_tel_num                  -- 固定电话号码
+    ,phone_num                      -- 联系手机
+from db_campus_education.tb_org
+
+
+==================
+db_campus_education.tb_staff_archives
+==================
+select 
+    ,data_id                        -- 自增主键
+    ,archives_id                    -- 档案id(同用户id)
+    ,org_id                         -- 机构id
+    ,avatar                         -- 头像
+    ,staff_type                     -- 人员类型(1-教师，2-教职工)
+    ,entry_date                     -- 入职日期
+    ,status                         -- 状态（0-停用 1-正常）
+    ,deleted                        -- 删除 0-已删除 1-正常
+    ,position_id                    -- 岗位id
+    ,dept_id                        -- 部门id
+    ,create_time                    -- 创建时间
+    ,change_type                    -- 异动类型（1-在职,2-离职,3-辞退,4-外部调转,5-退休）
+    ,update_time                    -- 修改时间
+from db_campus_education.tb_staff_archives
+
+
+==================
+db_campus_education.tb_student
+==================
+select 
+    ,student_id                     -- 学生id
+    ,org_id                         -- 学校id
+    ,class_id                       -- 班级id
+    ,status                         -- 学生状态（0-停用 1-正常 2-毕业 3-结业）
+    ,deleted                        -- 删除 0-已删除 1-正常
+    ,student_name                   -- 姓名
+    ,parent_name                    -- 家长姓名
+    ,student_no                     -- 学号
+    ,sex                            -- 1-男 2-女 3-其他
+    ,birthday                       -- 出生日期
+    ,card_no                        -- 身份证号码
+    ,home_address                   -- 家庭地址
+    ,enter_school_date              -- 入学日期
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 修改时间
+    ,card_type                      -- 证件类型
+    ,nation                         -- 民族
+    ,avatar                         -- 头像
+    ,user_id                        -- 关联家长用户id
+    ,province_id                    -- 省份id
+    ,city_id                        -- 城市id
+    ,area_id                        -- 区县id
+    ,province_city_area             -- 省市区
+    ,pronunciation                  -- 姓名读音
+from db_campus_education.tb_student
+
+
+==================
+db_campus_education.tb_system_dict_item
+==================
+select 
+    ,dict_id                        -- 字典id
+    ,item_text                      -- 字典项文本
+    ,item_value                     -- 字典项值
+    ,description                    -- 描述
+    ,show_order                     -- 排序
+    ,deleted                        -- 0：删除，1：正常
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 更新时间
+from db_campus_education.tb_system_dict_item
+
+
+==================
+db_campus_education.tb_user
+==================
+select 
+    ,user_id                        -- 用户id
+    ,username                       -- 账号
+    ,password                       -- 密码
+    ,real_name                      -- 昵称
+    ,sex                            -- 性别 1-男 2-女 3-其他
+    ,mobile                         -- 手机
+    ,email                          -- 邮箱
+    ,system_code                    -- 可登录的系统权限,多个以英文逗号隔开
+    ,salt                           -- 密码盐-加密key
+    ,status                         -- 0停用 1正常
+    ,deleted                        -- 1正常0已删除
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 更新时间
+    ,id_card_type                   -- 证件类型
+    ,id_card                        -- 证件号码
+    ,birthday                       -- 生日
+    ,nation                         -- 民族
+    ,political_status               -- 政治面貌
+    ,education                      -- 最高学历
+    ,province_id                    -- 省份id
+    ,city_id                        -- 城市id
+    ,area_id                        -- 区县id
+    ,province_city_area             -- 省市区
+    ,address                        -- 详细地址
+    ,clife_id                       -- 公共平台的用户id
+from db_campus_education.tb_user
+
+
+==================
+db_campus_education.tb_class_room
+==================
+select 
+    ,class_room_id                  -- 教室id
+    ,class_room_name                -- 教室名称（位置）
+    ,class_id                       -- 班级id
+    ,status                         -- 班级教室状态（0-失效 1-正常）
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 更新时间
+    ,school_id                      -- 学校id
+from db_campus_education.tb_class_room
+
+
+==================
+db_campus_center.tb_env_country
+==================
+select 
+    ,country_id                     -- 国家标识
+    ,country_name                   -- 国家名称
+    ,country_en_name                -- 国家英文名
+from db_campus_center.tb_env_country
+
+
+==================
+db_campus_center.tb_env_partition
+==================
+select 
+    ,country_id                     -- 国家标识
+    ,partition_id                   -- 地理分区标识
+    ,partition_name                 -- 地理分区名称
+from db_campus_center.tb_env_partition
+
+
+==================
+db_campus_center.tb_env_province
+==================
+select 
+    ,partition_id                   -- 地理分区标识
+    ,province_id                    -- 省份标识
+    ,province_name                  -- 省份名称
+    ,province_english_name         
+    ,longitude                      -- 经度
+    ,latitude                       -- 纬度
+    ,baidu_code                     -- 百度编码
+from db_campus_center.tb_env_province
+
+
+==================
+db_campus_center.tb_env_city
+==================
+select 
+    ,province_id                    -- 省份标识
+    ,city_id                        -- 城市标识
+    ,baidu_city_code                -- 百度城市编码
+    ,city_name                      -- 城市名称
+    ,city_english_name             
+    ,longitude                      -- 经度
+    ,latitude                       -- 纬度
+    ,is_capital                     -- 是否为省会城市（0-否 1-是）
+from db_campus_center.tb_env_city
+
+
+==================
+db_campus_center.tb_env_area
+==================
+select 
+    ,city_id                        -- 地级市标识
+    ,area_id                        -- 县级市、区标识
+    ,area_name                      -- 县级市、区名称
+    ,area_english_name              -- 县级市、区英文名
+    ,weather_code                   -- 天气编码
+from db_campus_center.tb_env_area
+
+
+==================
+db_campus_center.tb_env_town
+==================
+select 
+    ,area_id                        -- 县级市、区标识
+    ,town_id                        -- 镇标识
+    ,town_name                      -- 镇名称
+from db_campus_center.tb_env_town
+
+
+==================
+db_campus_center.tb_env_village
+==================
+select 
+    ,town_id                        -- 镇标识
+    ,village_id                     -- 村标识
+    ,village_name                   -- 村名称
+from db_campus_center.tb_env_village
+
+
+==================
+db_campus_platform.tb_student_health_file
+==================
+select 
+    ,data_id                        -- 唯一标识
+    ,student_data_id                -- 学生id
+    ,father_name                    -- 父亲姓名
+    ,father_phone                   -- 父亲电话
+    ,father_family_history          -- 父亲家族病史
+    ,mother_name                    -- 母亲姓名
+    ,mother_phone                   -- 母亲电话
+    ,mother_family_history          -- 母亲家族病史
+    ,home                           -- 详细住址
+    ,address                        -- 地址
+    ,province_id                    -- 省Id
+    ,city_id                        -- 市Id
+    ,area_id                        -- 区Id
+    ,report                         -- 上报 0未上报1已上报2最新未上报
+    ,update_results                 -- 更新结果 0无更新1有更新
+    ,history_of_convulsions         -- 高热惊厥史,0：无，1：有
+    ,attack_temp                    -- 发作时温度
+    ,number_of_attacks              -- 发作次数
+    ,serious_disease_history        -- 各种严重病史，0：无，1：有
+    ,serious_disease_history_details -- 严重病史详情
+    ,infectious_disease_history     -- 各种传染病史，0：无，1：有
+    ,infectious_disease_history_details -- 传染病史详情
+    ,other_infectious_disease_history --  其他传染病史
+    ,history_of_surgery             -- 手术史 0无1有
+    ,history_of_surgery_details     -- 手术史详情
+    ,weight                         -- 体重（单位：kg）
+    ,weight_assess                  -- 0：中上，1：中等，2：中下
+    ,height                         -- 身高（单位：cm）
+    ,height_assess                  -- 0：中上，1：中等，2：中下
+    ,bmi                            -- bmi数值
+    ,bmi_assess                     -- 0：中上，1：中等，2：中下
+    ,left_eye                       -- 0:未检查，1：正常，2：砂眼，3：结膜炎
+    ,right_eye                      -- 0:未检查，1：正常，2：砂眼，3：结膜炎
+    ,left_vision                    -- 左视力
+    ,right_vision                   -- 右视力
+    ,number_of_caries               -- 龋齿数,“”空字符串为未检测
+    ,number_of_teeth                -- 牙齿数量
+    ,head_neck                      --  头颈，0：未检测，1：正常，2：异常
+    ,thoracic                       -- 胸廓，0：未检测，1：正常，2：异常
+    ,spine                          -- 脊椎，0：未检测，1:正常，2：异常
+    ,limbs                          -- 四肢，0：未检测，1:正常，2：异常
+    ,pharynx                        -- 咽部，0：未检测，1：正常，2：异常
+    ,heart                          -- 心，0：未检测，1：正常，2：异常
+    ,lung                           -- 肺，0：未检测，1：正常，2：异常
+    ,liver                          -- 肝，0：未检测，1：正常，2：异常
+    ,spleen                         -- 脾，0：未检测，1：正常，2异常
+    ,hemoglobin                     -- 血红蛋白（单位：g/h）
+    ,alt                            -- 丙氨酸氨基转移酶，0：未检测，1：正常，2：异常
+    ,other                          -- 其他
+    ,complete                       -- 1：齐全，0：不齐
+    ,lack                           -- 0：卡芥兰，1：乙肝，2：麻疹，3：骨髓灰质炎，4：百白破，5：乙脑
+    ,create_time                    -- 创建时间
+    ,whether_allergy                -- 是否过敏体质，0：否，1：是
+    ,status                         -- 0：失效，1：正常，2：停用
+    ,update_time                    -- 更新时间
+    ,report_time                    -- 上报时间
+    ,resource                       -- 0:健康档案，1：健康体检复制内容
+    ,checkup_id                     -- 体检id
+    ,deleted                        -- 0：删除，1：正常
+    ,is_archives                    -- 档案状态 1提交资料 2归档完成
+    ,archives_time                  -- 归档时间
+    ,modular                        -- 模块 1基本信息2病史3过敏史4健康信息5接种信息
+    ,health                         -- 健康情况
+    ,is_organic_diseases            -- 是否患有身体重要器官或组织的器质性疾病 0否1是
+    ,is_organic_diseases_details    -- 身体重要器官或组织的器质性疾病详情
+    ,is_blood_disease               -- 是否患有血液病 0否1是
+    ,is_blood_disease_details       -- 血液病详情
+    ,is_diffuse_connective_disease  -- 是否患有弥漫性结缔组织疾病  0否1是
+    ,is_diffuse_connective_disease_details -- 弥漫性结缔组织疾病详情
+    ,is_congenital_malformation     -- 是否患有影响正常生活、学习、活动的先天畸形或疾病等  0否1是
+    ,is_congenital_malformation_details -- 先天畸形或疾病详情
+    ,is_organic_psychosis           -- 是否患有器质性精神病  0否1是
+    ,is_organic_psychosis_details   -- 器质性精神病详情
+    ,is_neurosis                    -- 是否患有严重的神经官能症 0否1是
+    ,is_neurosis_details            -- 神经官能症详情
+    ,is_psychoactive_substance      -- 是否患有精神活性物质滥用和依赖  0否1是
+    ,is_psychoactive_substance_details -- 精神活性物质滥用和依赖详情
+    ,is_organ_injury                -- 是否有意外伤害导致的组织器官损伤或畸形等  0否1是
+    ,is_organ_injury_details        -- 意外伤害导致的组织器官损伤或畸形详情
+from db_campus_platform.tb_student_health_file
+
+
+==================
+db_campus_platform.tb_student_am_inspection
+==================
+select 
+    ,inspection_id                  -- 晨午检Id
+    ,org_id                         -- 学校Id
+    ,student_id                     -- 学生Id
+    ,user_id                        -- 检查人Id
+    ,type                           -- 检查类型 0晨检 1午检
+    ,img                            -- 检查图片
+    ,is_temperature                 -- 体温 0正常 1具体温度
+    ,temperature                    -- 体温值(选择具体温度才有值)
+    ,inspection_date                -- 检查日期
+    ,is_abnormal                    -- 检查结果 0异常 1正常
+    ,other_symptom                  -- 其他症状
+    ,is_disease                     -- 疾病确认(0可以确认 1无法确认)
+    ,disease_id                     -- 疾病Id
+    ,infectious_disease             -- 是否传染病(0:否，1:是，2无法确认)
+    ,disease_name                   -- 疾病名称
+    ,treatment                      -- 处理情况 0家长送医 1留园观察 2停课治疗 3其他
+    ,other                          -- 其他情况
+    ,deleted                        -- 是否删除 0是 1不是
+    ,status                         -- 状态 0已确定 1待确认
+    ,data_sources                   -- 数据来源  0 web录入  1 智能设备 2批量创建 3移动端录入
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 修改时间
+from db_campus_platform.tb_student_am_inspection
+
+
+==================
+db_campus_platform.tb_into_campus_detail
+==================
+select 
+    ,record_id                      -- 记录ID
+    ,org_id                         -- 机构ID
+    ,student_id                     -- 学生唯一标识
+    ,data_time                      -- 数据日期
+    ,am_status                      -- 入园状态(0-未入园、1-已入园)
+    ,att_status                     -- 考勤入园状态(0-未入园、1-已入园、2-病假，3-事假)
+    ,admin                          -- 是否管理员修改(0-否、1-是)
+    ,am_time                        -- 入园时间(HH:mm:ss)
+    ,type                           -- 条件类型（0-默认、1-考勤、2-饮水、3-步数、4-运动量、5-晨检）
+    ,create_time                    -- 创建时间
+    ,value                          -- 数据值
+from db_campus_platform.tb_into_campus_detail
+
+
+==================
+db_campus_platform.tb_medicine
+==================
+select 
+    ,data_id                        -- 唯一标识
+    ,student_id                     -- 学生id
+    ,medication_date                -- 喂药日期
+    ,whether_inspect                -- 药品是否视检,0:否，1：是
+    ,medication_reasons             -- 用药原因
+    ,number_of_feeding              -- 喂药次数
+    ,deleted                        -- 0：删除，1：正常
+    ,status                         -- 1-待视检、2-已撤销、3-已视检、4-已完成
+    ,source                         -- 0-老师录入，1-家长录入
+    ,update_time                    -- 更新时间
+    ,create_time                    -- 创建时间
+    ,parent_sign_url                -- 家长签字图片
+from db_campus_platform.tb_medicine
+
+
+==================
+db_campus_platform.tb_medicine_details
+==================
+select 
+    ,data_id                        -- 唯一标识
+    ,feeding_id                     -- 喂药信息id
+    ,medicine_name                  -- 药物名称
+    ,medication_time                -- 用药时间
+    ,medication_method              -- 用药方式，0：口服，1：外用
+    ,dosage                         -- 用药剂量
+    ,unit                           -- 单位，0：包，1：颗，2：滴，3：ml
+    ,picture_url                    -- 药物图片url
+    ,medication_status              -- 0：待喂药，1：已喂药
+    ,status                         -- 0：失效，1：正常，2：停用
+    ,update_time                    -- 更新时间
+    ,create_time                    -- 创建时间
+    ,moment                         -- 0：早上，1：中午
+from db_campus_platform.tb_medicine_details
+
+
+==================
+db_campus_message.tb_message
+==================
+select 
+    ,message_id                     -- 信息编号
+    ,app_name                       -- 应用名称
+    ,title                          -- 标题
+    ,summary                        -- 概要，简单描述
+    ,picture_url                    -- 简图路径
+    ,sender                         -- 发送者(系统发送的sender为0)
+    ,icon                           -- 图标URL
+    ,message_type                   -- 消息类型,对应 db_campus_education#tb_resource 的 resource_id
+    ,business_param                 -- 业务参数的值,json格式
+    ,status                         -- 是否有效(0:无效；1正常)
+    ,create_time                    -- 创建时间
+    ,jump_link_url                  -- 跳转链接(应用代码)
+    ,content_type                   -- 消息内容类型(0 - 富文本方式; 1 - 跳转消息)
+    ,data_flag                      -- 数据来源标识（默认为0-普通推送消息；1-园丁端老师；2-校园运营端）
+from db_campus_message.tb_message
+
+
+==================
+db_campus_platform.tb_vision_data
+==================
+select 
+    ,vision_id                      -- 视力数据ID
+    ,student_id                     -- 学生唯一标识
+    ,left_vision                    -- 左眼视力
+    ,right_vision                   -- 右眼视力
+    ,left_abnormal                  -- 左眼视力状态（1-正常、0-不正常）
+    ,right_abnormal                 -- 右眼视力状态（1-正常、0-不正常）
+    ,source                         -- 数据来源（1-后台添加、2-后台导入、3-家长录入、4-老师录入、5万灵视力仪）
+    ,measure_time                   -- 测量日期
+    ,upload_time                    -- 上传时间
+from db_campus_platform.tb_vision_data
+
+
+==================
+db_campus_platform.tb_thermometer_data
+==================
+select 
+    ,thermometer_id                 -- 体温Id
+    ,device_id                      -- 设备编号
+    ,student_id                     -- 学生唯一标识
+    ,value                          -- 体温值
+    ,level                          -- （体温正常状态）0：偏低，1：正常   2：低热，3高热
+    ,measure_time                   -- 测量时间
+    ,upload_time                    -- 上传时间
+    ,source                         -- 数据来源：1-体温检测仪；2-家长APP；3-米越耳温枪;4-晨检机器人
+    ,status                         -- 状态（0：无效 1：有效）
+    ,if_check                       -- 状态（0：未审核 1：已审核）
+from db_campus_platform.tb_thermometer_data
+
+
+==================
+db_campus_platform.tb_water_drink_record
+==================
+select 
+    ,data_id                        -- 自增主键
+    ,student_id                     -- 学生唯一ID
+    ,order_id                       -- 刷卡时间+卡号
+    ,device_no                      -- 设备编号
+    ,data_time                      -- 刷卡日期
+    ,cdate                          -- 刷卡时间
+    ,card_no                        -- 卡号
+    ,water_amount                   -- 出水量ml
+    ,is_auto                        -- 1-净饮机 2-手动添加
+    ,intds                          -- 进水TDS
+    ,outtds                         -- 出水TDS
+    ,temperature                    -- 饮水温度
+    ,time_integer                   -- 时分秒的整数
+    ,school_id                      -- 学校ID
+    ,device_type                    -- 净饮机类型：1-海豚净饮机，2-易水香净饮机，3-碧丽水机，4-米越取水刷卡器
+    ,create_time                    -- 创建时间
+    ,device_position                -- 饮水机位置
+from db_campus_platform.tb_water_drink_record
+
+
+==================
+db_campus_platform.tb_water_drink_setting
+==================
+select 
+    ,data_id                        -- 主键ID
+    ,org_id                         -- 机构ID
+    ,grade_id                       -- 年级ID
+    ,enough                         -- 饮水量充足
+    ,standard                       -- 饮水量达标
+    ,device_type                    -- 饮水设备类型：1-净饮机，2-刷卡器
+    ,detail                         -- 明细设置（0-家长不可见，1-家长可见）
+    ,visible                        -- 饮水规则设置（0-不可见 1-可见）
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 修改时间
+    ,deleted                        -- （是否删除）0-删除，1-正常
+from db_campus_platform.tb_water_drink_setting
+
+
+==================
+db_campus_platform.tb_sport_amount_original
+==================
+select 
+    ,data_id                        -- 记录ID
+    ,student_id                     -- 学生ID
+    ,device_no                      -- 设备编号
+    ,measure_time                   -- 测量时间
+    ,data_time                      -- 数据日期
+    ,sport_num                      -- 运动量
+    ,upload_time                    -- 更新时间
+    ,source                         -- 数据来源 1-手环；2-家长APP；3-手表；4-米越；5-天波
+from db_campus_platform.tb_sport_amount_original
+
+
+==================
+db_campus_platform.tb_sports_record
+==================
+select 
+    ,data_id                        -- 主键标识
+    ,device_no                      -- 设备编号
+    ,student_id                     -- 学生唯一标识
+    ,value                          -- 步数
+    ,level                          -- 保留
+    ,source                         -- 数据来源：1-手环；2-家长APP；3-手表；4-米越；5-天波
+    ,data_time                      -- 测量日期
+    ,measure_time                   -- 测量时间
+    ,upload_time                    -- 数据上传时间
+    ,step_type                      -- 步数类型：81-小时步数，111-总步数
+    ,from_type                      -- 来源类型：1-app,2-ap盒子
+from db_campus_platform.tb_sports_record
+
+
+==================
+db_campus_platform.tb_sports_assess_setting
+==================
+select 
+    ,dataId                         -- 主键
+    ,org_id                         -- 机构id
+    ,grade_id                       -- 年级id
+    ,adequate                       -- 充足
+    ,standard                       -- 达标
+    ,insufficient                   -- 不足
+    ,update_time                    -- 更新时间
+    ,create_time                    -- 创建时间
+    ,visible                        -- 运动规则开关(0-关 1-开)
+from db_campus_platform.tb_sports_assess_setting
+
+
+==================
+db_campus_platform.tb_sleep_day_data
+==================
+select 
+    ,data_id                        -- 主键
+    ,device_no                      -- 设备编号
+    ,student_id                     -- 学生id
+    ,date                           -- 数据所在日期
+    ,sleep_duration                 -- 睡眠时长（秒）
+    ,wake_duration                  -- 清醒时长（秒）
+    ,wake_number                    -- 清醒次数
+    ,score                          -- 睡眠打分
+    ,source                         -- 数据来源(1-天波手环，2-米越手环，3-睡眠带子)
+    ,valid                          -- 睡眠数据有效性（1-有效，2-无效）
+    ,upload_time                    -- 上传时间(utc)
+    ,create_time                    -- 创建时间
+from db_campus_platform.tb_sleep_day_data
+
+
+==================
+db_campus_platform.tb_sleep_day_status
+==================
+select 
+    ,data_id                        -- 主键
+    ,device_no                      -- 设备id
+    ,student_id                     -- 学生id
+    ,date                           -- 数据所在日期
+    ,start_time                     -- 睡眠状态开始时间(utc)
+    ,status                         -- 睡眠状态（1-上床，2-入睡，3-浅睡，4-深睡，5-清醒，6-睡着，7-离床，8-再次上床，9-中途起床，10-微觉醒）
+    ,source                         -- 数据来源(1-天波手环，2-米越手环，3-睡眠带子)
+from db_campus_platform.tb_sleep_day_status
+
+
+==================
+db_campus_platform.tb_student_body_data
+==================
+select 
+    ,body_data_id                   -- 唯一标识
+    ,student_id                     -- 学生唯一标识
+    ,device_no                      -- 设备编号
+    ,height                         -- 身高（cm）
+    ,weight                         -- 体重（kg）
+    ,level                          -- （身材正常状态）  0：偏瘦  1：标准  2：超重  3：肥胖 99-其它
+    ,height_level                   -- （身高状态）  0：偏矮  1：标准  2：偏高
+    ,measure_time                   -- 测量时间
+    ,upload_time                    -- 上传时间
+    ,source                         -- 数据来源：1-身高体重仪；2-家长APP；3-NB-身高体重仪；4-后台导入,5:上和身高体重仪，6：鼎恒身高体重仪,7:手动添加
+    ,status                         -- 状态（0：无效 1：有效）
+    ,if_check                       -- 状态（0：未审核 1：已审核）
+    ,bmi                            -- bmi
+from db_campus_platform.tb_student_body_data
+
+
+==================
+db_campus_platform.tb_shit_card_data
+==================
+select 
+    ,data_id                        -- 主键标识
+    ,device_no                      -- 设备编号
+    ,student_id                     -- 学生唯一标识
+    ,value                          -- 数据index
+    ,card_time                      -- 刷卡时间(本地)
+    ,status                         -- 状态（0：无效 1：有效）
+    ,upload_time                    -- 上传时间(本地)
+from db_campus_platform.tb_shit_card_data
+
+
+==================
+db_campus_platform.tb_interest_activity
+==================
+select 
+    ,activity_id                    -- 活动id
+    ,activity_name                  -- 活动名称
+    ,start_time                     -- 开始时间
+    ,end_time                       -- 结束时间
+    ,org_id                         -- 学校id
+    ,class_id                       -- 班级Id
+    ,week                           -- 日期 1:周一 2:周二 3:周三 4:周四 5:周五 6:周六  7:周日
+    ,status                         -- 状态（0-失效 1-正常）
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 更新时间
+from db_campus_platform.tb_interest_activity
+
+
+==================
+db_campus_platform.tb_interest_map_location
+==================
+select 
+    ,map_location_id                -- 活动位置编号
+    ,map_id                         -- 地图编号
+    ,org_id                         -- 机构id
+    ,coordinates                    -- 所在地图的位置坐标
+    ,location_name                  -- 活动位置名称
+    ,function                       -- 位置使用功能
+    ,status                         -- 状态：0-无效；1-有效
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 修改时间
+    ,type                           -- 类型（0-教室、1-室内公共区、2-室外公共区）
+    ,class_room_id                  -- 教室唯一标识
+    ,class_id                      
+    ,number_people                  -- 限定人数
+    ,areas_id                       -- 公共区域ID
+from db_campus_platform.tb_interest_map_location
+
+
+==================
+db_campus_platform.tb_interest_student_location
+==================
+select 
+    ,data_id                        -- 主键标识
+    ,student_id                     -- 学生唯一标识
+    ,map_location_id                -- 活动位置编号
+    ,time_length                    -- 学生停留时长(单位秒)
+    ,enter_time                     -- 进入时间
+    ,leave_time                     -- 离开时间
+    ,create_time                    -- 创建时间
+    ,update_time                    -- 更新时间
+    ,activity_data                  -- 活动数据表示:1(是) 
+    ,source                         -- 数据来源（1-米越，2-天波）
+from db_campus_platform.tb_interest_student_location
+
+

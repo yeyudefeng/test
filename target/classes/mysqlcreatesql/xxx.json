@@ -1,0 +1,1102 @@
+{
+  "schema": "",
+  "profile": {
+    "productKey": "0000000100060804"
+  },
+  "properties": [{
+    "identifier": "Base_Null_OnOff_AdjustBodyMov",
+    "name": "是否需要校准体动",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "否",
+        "1": "是",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_Null_Step_AdjustBodyMov",
+    "name": "校准体动状态",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "无校准",
+        "1": "正在校准",
+        "2": "校准成功",
+        "3": "校准失败",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_Null_ModeSet_OnOrOutOfBed",
+    "name": "在离床状态",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "带上空无一人",
+        "1": "物在带上",
+        "2": "人在带旁",
+        "3": "人在带上",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_Null_OnOff_UpOriginalSignal",
+    "name": "上传原始信号开关",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "不上传",
+        "1": "上传",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "updateFlag",
+    "name": "功能变更",
+    "dataType": {
+      "type": "HEXSTRING",
+      "specs": {}
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_Clock_Null",
+    "name": "时间戳1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "4294967295",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_ValueChar_SignalQuality",
+    "name": "信号质量1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "7",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_Status_OnOrOutOfBed",
+    "name": "在离床1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "带上空无一人",
+        "1": "物在带上",
+        "2": "人在带旁",
+        "3": "人在带上",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_ValueShort_BodyActivityEnergy",
+    "name": "体动能量1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "65535",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_Status_BodyActivityType",
+    "name": "体动类型1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "无体动状态",
+        "1": "有体动状态",
+        "2": "小体动结束",
+        "3": "大体动结束",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_ValueChar_BodyActivityTime",
+    "name": "体动持续时间1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_ValueChar_HeartRate",
+    "name": "心率1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_1_ValueChar_RespiratoryRate",
+    "name": "呼吸率1",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_Clock_Null",
+    "name": "时间戳2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "4294967295",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_ValueChar_SignalQuality",
+    "name": "信号质量2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "7",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_Status_OnOrOutOfBed",
+    "name": "在离床2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "带上空无一人",
+        "1": "物在带上",
+        "2": "人在带旁",
+        "3": "人在带上",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_ValueShort_BodyActivityEnergy",
+    "name": "体动能量2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "65535",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_Status_BodyActivityType",
+    "name": "体动类型2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "无体动状态",
+        "1": "有体动状态",
+        "2": "小体动结束",
+        "3": "大体动结束",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_ValueChar_BodyActivityTime",
+    "name": "体动持续时间2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_ValueChar_HeartRate",
+    "name": "心率2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_2_ValueChar_RespiratoryRate",
+    "name": "呼吸率2",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_Clock_Null",
+    "name": "时间戳3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "4294967295",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_ValueChar_SignalQuality",
+    "name": "信号质量3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "7",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_Status_OnOrOutOfBed",
+    "name": "在离床3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "带上空无一人",
+        "1": "物在带上",
+        "2": "人在带旁",
+        "3": "人在带上",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_ValueShort_BodyActivityEnergy",
+    "name": "体动能量3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "65535",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_Status_BodyActivityType",
+    "name": "体动类型3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "无体动状态",
+        "1": "有体动状态",
+        "2": "小体动结束",
+        "3": "大体动结束",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_ValueChar_BodyActivityTime",
+    "name": "体动持续时间3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_ValueChar_HeartRate",
+    "name": "心率3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_3_ValueChar_RespiratoryRate",
+    "name": "呼吸率3",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_Clock_Null",
+    "name": "时间戳4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "4294967295",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_ValueChar_SignalQuality",
+    "name": "信号质量4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "7",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_Status_OnOrOutOfBed",
+    "name": "在离床4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "带上空无一人",
+        "1": "物在带上",
+        "2": "人在带旁",
+        "3": "人在带上",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_ValueShort_BodyActivityEnergy",
+    "name": "体动能量4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "65535",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_Status_BodyActivityType",
+    "name": "体动类型4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "无体动状态",
+        "1": "有体动状态",
+        "2": "小体动结束",
+        "3": "大体动结束",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_ValueChar_BodyActivityTime",
+    "name": "体动持续时间4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_ValueChar_HeartRate",
+    "name": "心率4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_4_ValueChar_RespiratoryRate",
+    "name": "呼吸率4",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_Clock_Null",
+    "name": "时间戳5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "4294967295",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_ValueChar_SignalQuality",
+    "name": "信号质量5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "7",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_Status_OnOrOutOfBed",
+    "name": "在离床5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "带上空无一人",
+        "1": "物在带上",
+        "2": "人在带旁",
+        "3": "人在带上",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_ValueShort_BodyActivityEnergy",
+    "name": "体动能量5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "65535",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_Status_BodyActivityType",
+    "name": "体动类型5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "0": "无体动状态",
+        "1": "有体动状态",
+        "2": "小体动结束",
+        "3": "大体动结束",
+        "type": "ENUM"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_ValueChar_BodyActivityTime",
+    "name": "体动持续时间5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_ValueChar_HeartRate",
+    "name": "心率5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "Base_5_ValueChar_RespiratoryRate",
+    "name": "呼吸率5",
+    "dataType": {
+      "type": "LONG",
+      "specs": {
+        "min": "0",
+        "max": "255",
+        "step": 1,
+        "type": "RANGE"
+      }
+    },
+    "ignore": false
+  }, {
+    "identifier": "command",
+    "dataType": {
+      "type": "STRING"
+    },
+    "name": "命令",
+    "ignore": false
+  }, {
+    "identifier": "macAddress",
+    "dataType": {
+      "type": "STRING"
+    },
+    "name": "MAC",
+    "ignore": false
+  }, {
+    "identifier": "deviceId",
+    "dataType": {
+      "type": "LONG"
+    },
+    "name": "设备Id",
+    "ignore": false
+  }, {
+    "identifier": "productId",
+    "dataType": {
+      "type": "LONG"
+    },
+    "name": "产品Id",
+    "ignore": false
+  }, {
+    "identifier": "dataTimeStamp",
+    "dataType": {
+      "type": "LONG"
+    },
+    "name": "时间戳",
+    "ignore": false
+  }],
+  "events": [{
+    "identifier": "info",
+    "name": "info",
+    "type": "info",
+    "desc": "info",
+    "method": "thing.event.property.post.info",
+    "outputData": []
+  }, {
+    "identifier": "alert",
+    "name": "alert",
+    "type": "alert",
+    "desc": "alert",
+    "method": "thing.event.property.post.alert",
+    "outputData": []
+  }, {
+    "identifier": "error",
+    "name": "error",
+    "type": "error",
+    "desc": "error",
+    "method": "thing.event.property.post.error",
+    "outputData": [{
+      "identifier": "Base_Null_Error_Longitude",
+      "name": "历史数据FLASH操作故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_Timing",
+      "name": "历史数据FLASH满故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_Deforst",
+      "name": "MCU复位",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_NotClosed",
+      "name": "MCU看门狗复位",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_WaterPressHigh",
+      "name": "MCU命令复位",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_WaterPressLow",
+      "name": "WIFI无应答故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_WifiToMcuComm",
+      "name": "断网故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_PowerOffMemory",
+      "name": "时间故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_FCComm",
+      "name": "原始数据FLASH操作故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_Off",
+      "name": "原始数据FLASH满故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_Fake",
+      "name": "绑定",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_Comm",
+      "name": "路由器断网故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_Connect",
+      "name": "服务器断网故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_HumiLow",
+      "name": "WIFI信号弱",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Error_On",
+      "name": "ADC采样故障",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "正常",
+          "1": "故障",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }]
+  }, {
+    "identifier": "online",
+    "name": "online",
+    "type": "info",
+    "desc": "在线离线事件",
+    "method": "thing.event.property.post.online",
+    "outputData": [{
+      "identifier": "online_status",
+      "dataType": {
+        "specs": {
+          "1": "离线",
+          "2": "在线",
+          "type": "ENUM"
+        },
+        "type": "LONG"
+      },
+      "name": "在线状态",
+      "ignore": false
+    }]
+  }, {
+    "identifier": "common",
+    "name": "common",
+    "type": "common",
+    "desc": "公共事件",
+    "method": "thing.event.property.post.common",
+    "outputData": [{
+      "identifier": "command",
+      "dataType": {
+        "type": "STRING"
+      },
+      "name": "命令",
+      "ignore": false
+    }, {
+      "identifier": "macAddress",
+      "dataType": {
+        "type": "STRING"
+      },
+      "name": "MAC",
+      "ignore": false
+    }, {
+      "identifier": "deviceId",
+      "dataType": {
+        "type": "LONG"
+      },
+      "name": "设备Id",
+      "ignore": false
+    }, {
+      "identifier": "productId",
+      "dataType": {
+        "type": "LONG"
+      },
+      "name": "产品Id",
+      "ignore": false
+    }, {
+      "identifier": "dataTimeStamp",
+      "dataType": {
+        "type": "LONG"
+      },
+      "name": "时间戳",
+      "ignore": false
+    }]
+  }],
+  "services": [{
+    "identifier": "config",
+    "name": "config",
+    "type": "config",
+    "desc": "配置协议属性服务",
+    "method": "thing.service.property.set.config",
+    "inputData": [{
+      "identifier": "Base_1_ClockCfg_Null",
+      "name": "时间戳1",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "min": "0",
+          "max": "4294967295",
+          "step": 1,
+          "type": "RANGE"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_1_StringCfg_TreatedBeltSignal",
+      "name": "处理过的传感带信号1",
+      "dataType": {
+        "type": "STRING",
+        "specs": {}
+      },
+      "ignore": false
+    }, {
+      "identifier": "MembraneSwitch_1_OnOffCfg_Null",
+      "name": "薄膜开关1",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "导通",
+          "1": "断开",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_2_ClockCfg_Null",
+      "name": "时间戳2",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "min": "0",
+          "max": "4294967295",
+          "step": 1,
+          "type": "RANGE"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_2_StringCfg_TreatedBeltSignal",
+      "name": "处理过的传感带信号2",
+      "dataType": {
+        "type": "STRING",
+        "specs": {}
+      },
+      "ignore": false
+    }, {
+      "identifier": "MembraneSwitch_2_OnOffCfg_Null",
+      "name": "薄膜开关2",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "导通",
+          "1": "断开",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_3_ClockCfg_Null",
+      "name": "时间戳3",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "min": "0",
+          "max": "4294967295",
+          "step": 1,
+          "type": "RANGE"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_3_StringCfg_TreatedBeltSignal",
+      "name": "处理过的传感带信号3",
+      "dataType": {
+        "type": "STRING",
+        "specs": {}
+      },
+      "ignore": false
+    }, {
+      "identifier": "MembraneSwitch_3_OnOffCfg_Null",
+      "name": "薄膜开关3",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "导通",
+          "1": "断开",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_4_ClockCfg_Null",
+      "name": "时间戳4",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "min": "0",
+          "max": "4294967295",
+          "step": 1,
+          "type": "RANGE"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_5_StringCfg_TreatedBeltSignal",
+      "name": "处理过的传感带信号4",
+      "dataType": {
+        "type": "STRING",
+        "specs": {}
+      },
+      "ignore": false
+    }, {
+      "identifier": "MembraneSwitch_4_OnOffCfg_Null",
+      "name": "薄膜开关4",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "导通",
+          "1": "断开",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }]
+  }, {
+    "identifier": "control",
+    "name": "control",
+    "type": "control",
+    "desc": "控制协议属性服务",
+    "method": "thing.service.property.set.control",
+    "inputData": [{
+      "identifier": "Base_Null_OnOff_AdjustBodyMov",
+      "name": "是否需要校准体动",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "否",
+          "1": "是",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_Step_AdjustBodyMov",
+      "name": "校准体动状态",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "无校准",
+          "1": "正在校准",
+          "2": "校准成功",
+          "3": "校准失败",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_ModeSet_OnOrOutOfBed",
+      "name": "在离床状态",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "带上空无一人",
+          "1": "物在带上",
+          "2": "人在带旁",
+          "3": "人在带上",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "Base_Null_OnOff_UpOriginalSignal",
+      "name": "上传原始信号开关",
+      "dataType": {
+        "type": "LONG",
+        "specs": {
+          "0": "不上传",
+          "1": "上传",
+          "type": "ENUM"
+        }
+      },
+      "ignore": false
+    }, {
+      "identifier": "updateFlag",
+      "name": "功能变更",
+      "dataType": {
+        "type": "HEXSTRING",
+        "specs": {}
+      },
+      "ignore": false
+    }]
+  }]
+}

@@ -1,0 +1,1264 @@
+===========================
+    clife_campus_dws_health_stu
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_health_stu  partition(part_date)
+select 
+   t.class_id                   -- '班级id'
+  ,max(t.class_name)                 -- '班级名称'
+  ,max(t.grade_id)                   -- '年级id'
+  ,max(t.grade_name)                 -- '年级名称'
+  ,max(t.org_id)                     -- '学校id'
+  ,max(t.org_name)                   -- '学校名称'
+  ,max(t.area_id) 				     -- '区县id'
+  ,sum(t.serious_disease_his)     -- '有严重病史'
+  ,sum(t.infectious_disease_his)   -- '有传染病史'
+  ,sum(t.weight_fat_assess)             -- '3：肥胖 '
+  ,sum(t.weight_high_assess)             -- '2：超重 '
+  ,sum(t.weight_mid_assess)             -- '1：标准 '
+  ,sum(t.weight_low_assess)             -- '0：偏瘦 '	  
+  ,sum(t.hight_high_assess)             -- '偏高'
+  ,sum(t.hight_mid_assess)             -- '标准'
+  ,sum(t.hight_low_assess)             -- '偏矮'
+  ,sum(t.bmi_fat_assess)             -- '3：肥胖 '
+  ,sum(t.bmi_high_assess)             -- '2：超重 '
+  ,sum(t.bmi_mid_assess)             -- '1：标准 '
+  ,sum(t.bmi_low_assess)             -- '0：偏瘦 '	
+  ,sum(t.left_eye_nd) 				     -- '左眼健康未检测'
+  ,sum(t.left_eye_normal) 				 -- '左眼健康正常'
+  ,sum(t.left_eye_blister) 		     -- '左眼砂眼'
+  ,sum(t.left_eye_conjunctivitis) 		 -- '左眼结膜炎'
+  ,sum(t.right_eye_nd) 				     -- '右眼健康未检测'
+  ,sum(t.right_eye_normal) 				 -- '右眼健康正常'
+  ,sum(t.right_eye_blister) 		         -- '右眼砂眼'
+  ,sum(t.right_eye_conjunctivitis) 		 -- '右眼结膜炎'  
+  ,sum(t.left_normal)                -- '左视力正常'
+  ,sum(t.left_abnormal)              -- '左视力异常'
+  ,sum(t.right_normal)              -- '右视力正常'
+  ,sum(t.right_abnormal)            -- '右视力异常'
+  ,sum(t.caries)          -- '患龋齿'
+  ,sum(t.head_neck_nd)			 -- ' 头颈正常'
+  ,sum(t.head_neck_normal)			 -- ' 头颈正常'
+  ,sum(t.head_neck_abnormal)	     -- ' 头颈异常'
+  ,sum(t.thoracic_nd)			 -- '胸廓正常'
+  ,sum(t.thoracic_normal)			 -- '胸廓正常'
+  ,sum(t.thoracic_abnormal)			 -- '胸廓异常'
+  ,sum(t.spine_nd)			    -- '脊椎正常'
+  ,sum(t.spine_normal)			 -- '脊椎正常'
+  ,sum(t.spine_abnormal)		 -- '脊椎异常'
+  ,sum(t.limbs_nd)			    -- '四肢正常'
+  ,sum(t.limbs_normal)			 -- '四肢正常'
+  ,sum(t.limbs_abnormal)		 -- '四肢异常'
+  ,sum(t.pharynx_nd	)	     -- '咽部正常'
+  ,sum(t.pharynx_normal	)	 -- '咽部正常'
+  ,sum(t.pharynx_abnormal)		 -- '咽部异常'
+  ,sum(t.heart_nd)			 -- '心正常'
+  ,sum(t.heart_normal)			 -- '心正常'
+  ,sum(t.heart_abnormal)		 -- '心异常'
+  ,sum(t.lung_nd)		     -- '肺正常'
+  ,sum(t.lung_normal)		     -- '肺正常'
+  ,sum(t.lung_abnormal)		     -- '肺异常'
+  ,sum(t.liver_nd)			 -- '肝正常'
+  ,sum(t.liver_normal)			 -- '肝正常'
+  ,sum(t.liver_abnormal)	     -- '肝异常'
+  ,sum(t.spleen_nd)			 -- '脾正常'
+  ,sum(t.spleen_normal)			 -- '脾正常'
+  ,sum(t.spleen_abnormal)		 -- '脾异常'
+  ,sum(t.alt_nd)		     -- '丙氨酸氨基转移酶正常'
+  ,sum(t.alt_normal)		     -- '丙氨酸氨基转移酶正常'  
+  ,sum(t.alt_abnormal)		     -- '丙氨酸氨基转移酶异常'
+  ,sum(t.lack)		 -- '接种'
+  ,sum(t.whether_allergy)			 --'过敏体质'
+  ,sum(t.no_whether_allergy)		 --'非过敏体质'
+  ,sum(t.allergy_ingredients)        -- '食材过敏'
+  ,count(t.student_id)               -- '学生人数'
+  ,regexp_replace(date_sub(current_date(),1),'-','')
+from
+( 
+select 
+   student_id                 -- '学生id'
+  ,class_id                   -- '班级id'
+  ,class_name                 -- '班级名称'
+  ,grade_id                   -- '年级id'
+  ,grade_name                 -- '年级名称'
+  ,org_id                     -- '学校id'
+  ,org_name                   -- '学校名称'
+  ,area_id 				     -- '区县id'
+  ,case when serious_disease_his =1 then 1 else 0 end 	serious_disease_his     -- '有严重病史'
+  ,case when infectious_disease_his =1 then 1 else 0 end  infectious_disease_his   -- '有传染病史'
+  ,case when weight_assess =3 then 1 else 0 end weight_fat_assess             -- '3：肥胖 '
+  ,case when weight_assess =2 then 1 else 0 end weight_high_assess             -- '2：超重 '
+  ,case when weight_assess =1 then 1 else 0 end weight_mid_assess             -- '1：标准 '
+  ,case when weight_assess =0 then 1 else 0 end weight_low_assess             -- '0：偏瘦 '	  
+  ,case when height_assess =2 then 1 else 0 end hight_high_assess             -- '偏高'
+  ,case when height_assess =1 then 1 else 0 end hight_mid_assess             -- '标准'
+  ,case when height_assess =0 then 1 else 0 end hight_low_assess             -- '偏矮'
+  ,case when bmi_assess =3 then 1 else 0 end bmi_fat_assess             -- '3：肥胖 '
+  ,case when bmi_assess =2 then 1 else 0 end bmi_high_assess             -- '2：超重 '
+  ,case when bmi_assess =1 then 1 else 0 end bmi_mid_assess             -- '1：标准 '
+  ,case when bmi_assess =0 then 1 else 0 end bmi_low_assess             -- '0：偏瘦 '	
+  ,case when left_eye =0 then 1 else 0 end left_eye_nd 				     -- '左眼健康未检测'
+  ,case when left_eye =1 then 1 else 0 end left_eye_normal 				 -- '左眼健康正常'
+  ,case when left_eye =2 then 1 else 0 end left_eye_blister 		     -- '左眼砂眼'
+  ,case when left_eye =3 then 1 else 0 end left_eye_conjunctivitis 		 -- '左眼结膜炎'
+  ,case when right_eye =0 then 1 else 0 end right_eye_nd 				     -- '右眼健康未检测'
+  ,case when right_eye =1 then 1 else 0 end right_eye_normal 				 -- '右眼健康正常'
+  ,case when right_eye =2 then 1 else 0 end right_eye_blister 		         -- '右眼砂眼'
+  ,case when right_eye =3 then 1 else 0 end right_eye_conjunctivitis 		 -- '右眼结膜炎'  
+  ,case when left_abnormal =1  then 1 else 0 end left_normal                -- '左视力正常'
+  ,case when left_abnormal =2  then 1 else 0 end left_abnormal              -- '左视力异常'
+  ,case when right_abnormal =1  then 1 else 0 end right_normal              -- '右视力正常'
+  ,case when right_abnormal =2  then 1 else 0 end right_abnormal            -- '右视力异常'
+  ,case when number_of_caries >0 then 1 else 0 end caries          -- '患龋齿'
+  ,case when head_neck 	=0 then 1 else 0 end  head_neck_nd			 -- ' 头颈正常'
+  ,case when head_neck 	=1 then 1 else 0 end  head_neck_normal			 -- ' 头颈正常'
+  ,case when head_neck 	=2 then 1 else 0 end  head_neck_abnormal	     -- ' 头颈异常'
+  ,case when thoracic 	=0 then 1 else 0 end  thoracic_nd			 -- '胸廓正常'
+  ,case when thoracic 	=1 then 1 else 0 end  thoracic_normal			 -- '胸廓正常'
+  ,case when thoracic 	=2 then 1 else 0 end  thoracic_abnormal			 -- '胸廓异常'
+  ,case when spine 		=0 then 1 else 0 end  spine_nd  			 -- '脊椎正常'
+  ,case when spine 		=1 then 1 else 0 end  spine_normal			 -- '脊椎正常'
+  ,case when spine 		=2 then 1 else 0 end  spine_abnormal		 -- '脊椎异常'
+  ,case when limbs 		=1 then 1 else 0 end  limbs_nd  			 -- '四肢正常'
+  ,case when limbs 		=1 then 1 else 0 end  limbs_normal			 -- '四肢正常'
+  ,case when limbs 		=2 then 1 else 0 end  limbs_abnormal		 -- '四肢异常'
+  ,case when pharynx 	=0 then 1 else 0 end  pharynx_nd    		 -- '咽部正常'
+  ,case when pharynx 	=1 then 1 else 0 end  pharynx_normal		 -- '咽部正常'
+  ,case when pharynx 	=2 then 1 else 0 end  pharynx_abnormal		 -- '咽部异常'
+  ,case when heart 		=0 then 1 else 0 end  heart_nd  			 -- '心正常'
+  ,case when heart 		=1 then 1 else 0 end  heart_normal			 -- '心正常'
+  ,case when heart 		=2 then 1 else 0 end  heart_abnormal		 -- '心异常'
+  ,case when lung 		=0 then 1 else 0 end  lung_nd    		     -- '肺正常'
+  ,case when lung 		=1 then 1 else 0 end  lung_normal		     -- '肺正常'
+  ,case when lung 		=2 then 1 else 0 end  lung_abnormal		     -- '肺异常'
+  ,case when liver 		=0 then 1 else 0 end  liver_nd  			 -- '肝正常'
+  ,case when liver 		=1 then 1 else 0 end  liver_normal			 -- '肝正常'
+  ,case when liver 		=2 then 1 else 0 end  liver_abnormal	     -- '肝异常'
+  ,case when spleen 	=0 then 1 else 0 end  spleen_nd 			 -- '脾正常'
+  ,case when spleen 	=1 then 1 else 0 end  spleen_normal			 -- '脾正常'
+  ,case when spleen 	=2 then 1 else 0 end  spleen_abnormal		 -- '脾异常'
+  ,case when alt 		=0 then 1 else 0 end  alt_nd		     -- '丙氨酸氨基转移酶正常'
+  ,case when alt 		=1 then 1 else 0 end  alt_normal		     -- '丙氨酸氨基转移酶正常'  
+  ,case when alt 		=2 then 1 else 0 end  alt_abnormal		     -- '丙氨酸氨基转移酶异常'
+  ,case when size(split(lack,',')) >0 then 1 else 0 end lack		 -- '接种'
+  ,case when whether_allergy =1 then 1 else 0 end whether_allergy			 --'过敏体质'
+  ,case when whether_allergy =0 then 1 else 0 end no_whether_allergy		 --'非过敏体质'
+  ,case when size(split(allergy_ingredients,',')) >0 then 1 else 0 end allergy_ingredients        -- '食材过敏'
+  from 
+  dwh_dw_campus.clife_campus_dwd_health_stu 
+  where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+) t 
+group by t.class_id
+
+
+===========================
+    clife_campus_dws_robot_check_report
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_robot_check_report  partition(part_date)
+select  
+ t.class_id         -- '班级id'
+,max(t.class_name)       -- '班级名称' 
+,max(t.grade_id)         -- '年级id'
+,max(t.grade_name)       -- '年级名称'
+,max(t.org_id)           -- '学校id'
+,max(t.org_name)         -- '学校名称'
+,max(t.area_id)          -- '学校区县id'
+,sum(t.`check`)      -- '已晨检'
+,sum(t.no_check)      -- '已晨检'
+,sum(t.many_check)      -- '多次晨检'
+,sum(t.result_normal)              --'结果正常人数'
+,sum(t.result_abnormal)            --'结果异常人数'
+,sum(t.temperature_low)            -- '低温'
+,sum(t.temperature_normal)         -- '正常'
+,sum(t.temperature_low_fever)      -- '低热'
+,sum(t.temperature_high)           -- '高热'
+,sum(t.hand_normal)  -- '手部异常'
+,sum(t.hand_abnormal)  -- '手部异常'
+,sum(t.mouth_normal)  -- '口腔异常'
+,sum(t.mouth_abnormal)  -- '口腔异常'
+,sum(t.red_eye_normal)  -- '红眼'
+,sum(t.red_eye_abnormal)  -- '红眼'
+,sum(t.fever_normal)  -- '发烧'
+,sum(t.fever_abnormal)  -- '发烧'
+,sum(t.cheek_normal)  -- '腮部肿大'
+,sum(t.cheek_abnormal)  -- '腮部肿大'
+,sum(t.spirit_normal)  -- '精神不佳'
+,sum(t.spirit_abnormal)  -- '精神不佳'
+,sum(t.throat_normal)  -- '咽炎'
+,sum(t.throat_abnormal)  -- '咽炎'
+,sum(t.trauma_normal)  -- '外伤'
+,sum(t.trauma_abnormal)  -- '外伤'
+,sum(t.cough_normal)  -- '咳嗽'
+,sum(t.cough_abnormal)  -- '咳嗽'
+,sum(t.fingernail_normal)  -- '指甲过长'
+,sum(t.fingernail_abnormal)  -- '指甲过长'
+,sum(t.tooth_decay_normal)  -- '蛀牙'
+,sum(t.tooth_decay_abnormal)  -- '蛀牙'
+,sum(t.other_normal)  -- '其他异常'
+,sum(t.other_abnormal)  -- '其他异常'
+,sum(t.`access`)        -- '允许入园'
+,count(t.student_id)    --'学生人数'
+,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from
+(
+select 
+ a.student_id
+,a.class_id         -- '班级id'
+,a.class_name       -- '班级名称' 
+,a.grade_id         -- '年级id'
+,a.grade_name       -- '年级名称'
+,a.org_id           -- '学校id'
+,a.org_name         -- '学校名称'
+,a.area_id          -- '学校区县id'
+,case when t2.`level` =0 then 1 else 0 end temperature_low            -- '低温'
+,case when t2.`level` =1 then 1 else 0 end temperature_normal         -- '正常'
+,case when t2.`level` =2 then 1 else 0 end temperature_low_fever      -- '低热'
+,case when t2.`level` =3 then 1 else 0 end temperature_high           -- '高热'
+,case when t2.hand         =1 then 1 else 0 end   hand_normal  -- '手部异常'
+,case when t2.hand         =2 then 1 else 0 end   hand_abnormal  -- '手部异常'
+,case when t2.mouth        =1 then 1 else 0 end   mouth_normal  -- '口腔异常'
+,case when t2.mouth        =2 then 1 else 0 end   mouth_abnormal  -- '口腔异常'
+,case when t2.red_eye      =1 then 1 else 0 end   red_eye_normal  -- '红眼'
+,case when t2.red_eye      =2 then 1 else 0 end   red_eye_abnormal  -- '红眼'
+,case when t2.fever        =1 then 1 else 0 end   fever_normal  -- '发烧'
+,case when t2.fever        =2 then 1 else 0 end   fever_abnormal  -- '发烧'
+,case when t2.cheek        =1 then 1 else 0 end   cheek_normal  -- '腮部肿大'
+,case when t2.cheek        =2 then 1 else 0 end   cheek_abnormal  -- '腮部肿大'
+,case when t2.spirit       =1 then 1 else 0 end   spirit_normal  -- '精神不佳'
+,case when t2.spirit       =2 then 1 else 0 end   spirit_abnormal  -- '精神不佳'
+,case when t2.throat       =1 then 1 else 0 end   throat_normal  -- '咽炎'
+,case when t2.throat       =2 then 1 else 0 end   throat_abnormal  -- '咽炎'
+,case when t2.trauma       =1 then 1 else 0 end   trauma_normal  -- '外伤'
+,case when t2.trauma       =2 then 1 else 0 end   trauma_abnormal  -- '外伤'
+,case when t2.cough        =1 then 1 else 0 end   cough_normal  -- '咳嗽'
+,case when t2.cough        =2 then 1 else 0 end   cough_abnormal  -- '咳嗽'
+,case when t2.fingernail   =1 then 1 else 0 end   fingernail_normal  -- '指甲过长'
+,case when t2.fingernail   =2 then 1 else 0 end   fingernail_abnormal  -- '指甲过长'
+,case when t2.tooth_decay  =1 then 1 else 0 end   tooth_decay_normal  -- '蛀牙'
+,case when t2.tooth_decay  =2 then 1 else 0 end   tooth_decay_abnormal  -- '蛀牙'
+,case when t2.other        =1 then 1 else 0 end   other_normal  -- '其他异常'
+,case when t2.other        =2 then 1 else 0 end   other_abnormal  -- '其他异常'
+,case when t2.abnormal_num =0 then 1 else 0 end   result_normal   -- '结果正常'
+,case when t2.abnormal_num >0 then 1 else 0 end   result_abnormal   -- '结果异常'
+,case when t3.measure_cnt  >0 then 1 else 0 end   `check`      -- '已晨检'
+,case when t3.measure_cnt  is null then 1 else 0 end   no_check      -- '未晨检'
+,case when t3.measure_cnt  >1 then 1 else 0 end   many_check      -- '多次晨检'
+,case when t2.`access`  =1 then 1 else 0 end   `access`      -- '允许入园'
+from 
+  dwh_dw_campus.clife_campus_dim_student a
+  left join 
+( 
+select t1.* from 
+(
+select 
+student_id      
+,class_id         -- '班级id'
+,class_name       -- '班级名称' 
+,grade_id         -- '年级id'
+,grade_name       -- '年级名称'
+,org_id           -- '学校id'
+,org_name         -- '学校名称'
+,area_id          -- '学校区县id'
+,`level`            -- '体温状态'
+,hand             -- '手部异常'
+,mouth            -- '口腔异常'
+,red_eye          -- '红眼'
+,fever            -- '发烧'
+,cheek            -- '腮部肿大'
+,spirit           -- '精神不佳'
+,throat           -- '咽炎'
+,trauma           -- '外伤'
+,cough            -- '咳嗽'
+,fingernail       -- '指甲过长'
+,tooth_decay      -- '蛀牙'
+,other            -- '其他异常'
+,abnormal_num     -- '异常数量'
+,access           -- '是否允许入园(1-是、0-否)'
+,row_number() over(partition by student_id order by measure_time desc) as ranks
+from dwh_dw_campus.clife_campus_dwd_robot_check_report 
+where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+) t1
+where t1.ranks=1 ) t2
+on a.student_id=t2.student_id 
+left join 
+(
+select student_id,count(data_id) as measure_cnt 
+from dwh_dw_campus.clife_campus_dwd_robot_check_report 
+where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+group by student_id
+) t3 
+on a.student_id=t3.student_id
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and a.status=1 and a.deleted=1
+) t  
+group by t.class_id
+
+
+===========================
+    clife_campus_dws_sleep_day_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_sleep_day_data  partition(part_date)
+select 
+   t.class_id                   -- '班级id'
+  ,max(t.class_name)                 -- '班级名称'
+  ,max(t.grade_id)                   -- '年级id'
+  ,max(t.grade_name)                 -- '年级名称'
+  ,max(t.org_id)                     -- '学校id'
+  ,max(t.org_name)                   -- '学校名称'
+  ,max(t.area_id) 				     -- '区县id'
+  ,sum(t.sleep_duration)             -- '睡眠时长（秒）'
+  ,sum(t.wake_duration)              -- '清醒时长（秒）'
+  ,sum(t.wake_number)                -- '清醒次数'
+  ,sum(t.score_0)         as score_0             -- '0星人数'
+  ,sum(t.score_1)         as score_1             -- '1星人数'
+  ,sum(t.score_2)         as score_2             -- '2星人数'
+  ,sum(t.score_3)         as score_3             -- '3星人数'
+  ,sum(t.score_4)         as score_4             -- '4星人数'
+  ,sum(t.score_5)         as score_5             -- '5星人数'
+  ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from 
+(
+select 
+   class_id                   -- '班级id'
+  ,class_name                 -- '班级名称'
+  ,grade_id                   -- '年级id'
+  ,grade_name                 -- '年级名称'
+  ,org_id                     -- '学校id'
+  ,org_name                   -- '学校名称'
+  ,area_id 				     -- '区县id'
+  ,sleep_duration             -- '睡眠时长（秒）'
+  ,wake_duration              -- '清醒时长（秒）'
+  ,wake_number                -- '清醒次数'
+  ,case when score=0.0 then 1 else 0 end  as   score_0    -- '0星'
+  ,case when score=1.0 then 1 else 0 end  as   score_1    -- '1星'
+  ,case when score=2.0 then 1 else 0 end  as   score_2    -- '2星'
+  ,case when score=3.0 then 1 else 0 end  as   score_3    -- '3星'
+  ,case when score=4.0 then 1 else 0 end  as   score_4    -- '4星'
+  ,case when score=5.0 then 1 else 0 end  as   score_5    -- '5星'                    -- '睡眠打分高'
+from dwh_dw_campus.clife_campus_dwd_sleep_day_data t1
+where t1.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+) t 
+group by t.class_id
+
+
+===========================
+    clife_campus_dws_sports_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_sports_data  partition(part_date)
+select 
+   t2.student_id           -- '学生唯一标识'
+  ,t2.student_name              -- '姓名'
+  ,t2.sex              -- '1-男 2-女 3-其他'
+  ,t2.age              --  '年龄'
+  ,t2.class_id              -- '班级id'
+  ,t2.class_name              -- '班级名称'
+  ,t2.grade_id              -- '年级id'
+  ,t2.grade_name              -- '年级名称'
+  ,t2.org_id              -- '学校id'
+  ,t2.org_name              -- '学校名称'
+  ,t2.area_id		     -- '区县id'
+  ,t2.sum_step              -- '总步数'
+  ,t2.is_enter              -- '是否入园'
+  ,case when st.data_id is not null and t2.is_enter=1 and (t3.sport_num is null or t3.sport_num<st.standard) then 0 
+        when st.data_id is not null and t2.is_enter=1 and t3.sport_num>=st.standard  and t3.sport_num<st.adequate then 1
+		when st.data_id is not null and t2.is_enter=1 and t3.sport_num>=st.adequate  then 2
+		when st.data_id is null and t2.is_enter=1 and (t3.sport_num is null or t3.sport_num<38000) then 0 
+        when st.data_id is null and t2.is_enter=1 and t3.sport_num>=38000  and t3.sport_num<50000 then 1
+		when st.data_id is null and t2.is_enter=1 and t3.sport_num>=50000   then 2
+		else null end  as access_status
+  ,t3.sport_num             -- '总运动量'
+  ,regexp_replace(date_sub(current_date(),1),'-','')
+from 
+(
+select
+   t1.student_id        student_id           -- '学生唯一标识'
+  ,max(t1.student_name) student_name              -- '姓名'
+  ,max(t1.sex)          sex              -- '1-男 2-女 3-其他'
+  ,max(t1.age)          age              --  '年龄'
+  ,max(t1.class_id)     class_id              -- '班级id'
+  ,max(t1.class_name)   class_name              -- '班级名称'
+  ,max(t1.grade_id)     grade_id              -- '年级id'
+  ,max(t1.grade_name)   grade_name              -- '年级名称'
+  ,max(t1.org_id)       org_id              -- '学校id'
+  ,max(t1.org_name)     org_name              -- '学校名称'
+  ,max(t1.area_id) 		area_id		     -- '区县id'
+  ,sum(t1.`value`)      sum_step              -- '总步数'
+  ,max(t1.is_enter)     is_enter              -- '是否入园'
+from 
+(
+select 
+  a.student_id                 -- '学生唯一标识'
+  ,a.student_name               -- '姓名'
+  ,a.sex                        -- '1-男 2-女 3-其他'
+  ,a.age                        --  '年龄'
+  ,a.class_id                   -- '班级id'
+  ,a.class_name                 -- '班级名称'
+  ,a.grade_id                   -- '年级id'
+  ,a.grade_name                 -- '年级名称'
+  ,a.org_id                     -- '学校id'
+  ,a.org_name                   -- '学校名称'
+  ,a.area_id 				     -- '区县id'
+  ,case when t.`value` is null then 0 else t.`value` end `value`   --'步数'
+  ,case when b.student_id is null then 0 else 1 end is_enter       --'是否入园'
+  from 
+  dwh_dw_campus.clife_campus_dim_student a 
+  left join 
+  dwh_dw_campus.clife_campus_dim_into_campus_detail b 
+  on a.student_id=b.student_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','') and b.am_status = 1 and b.data_time=date_sub(current_date(),1)
+  left join 
+  dwh_dw_campus.clife_campus_dwd_sports_record t
+on a.student_id=t.student_id and   t.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and a.deleted=1 and a.status=1
+)  t1
+group by t1.student_id
+) t2 
+left join 
+(
+select student_id,sum(sport_num) as sport_num from 
+dwh_dw_campus.clife_campus_dwd_sports_amount where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+group by student_id
+) t3
+on  t2.student_id=t3.student_id
+left join 
+dwh_dw_campus.clife_campus_dim_sports_assess_setting	st
+on t2.org_id=st.org_id and t2.grade_id=st.grade_id and st.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dws_location_stu_converge
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_location_stu_converge partition(part_date)
+select
+     student_id                            --'学生唯一标识'
+    ,map_location_id                       --'活动位置编号'
+    ,max(location_name) as  location_name  --'活动位置名称'
+    ,max(`type`) as  type                  --'类型'
+    ,substr(enter_time,1,10) as activity_day --活动日期
+    ,max(student_name)  as student_name -- '姓名'
+    ,class_id                             -- '班级id'
+    ,max(class_name)    as class_name     -- '班级名称'
+    ,grade_id                             -- '年级id'
+    ,max(grade_name)    as grade_name     -- '年级名称'
+    ,org_id                               -- '学校id'
+    ,max(org_name)      as org_name       -- '学校名称'
+    ,org_area_id                          -- '学校县区id'
+    ,max(org_area_name) as org_area_name  -- '学校县区名称'
+    ,sum(time_length) as stop_time        --'停留总时长'
+    ,count(time_length) as stop_count     --'停留总次数'
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from dwh_dw_campus.clife_campus_dwd_location_stu
+where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+group by student_id
+        ,map_location_id
+        ,substr(enter_time,1,10)
+        ,class_id
+        ,grade_id
+        ,org_id
+        ,org_area_id
+
+
+===========================
+    clife_campus_dws_disposition_stu_converge
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_disposition_stu_converge partition(part_date)
+select
+     class_id -- 班级id
+    ,class_name -- 班级名称
+    ,grade_id-- 年级id
+    ,grade_name-- 年级名称
+    ,org_id-- 学校id
+    ,org_name-- 学校名称
+    ,org_area_id-- 学校区县id
+    ,org_area_name -- 学校县区名称
+    ,sub_count -- 学生人数
+    ,measurement_num -- 量表测量人数
+    ,disposition_num -- 绘画分析测量人数
+    ,synthesis_1_introversion_num -- 综合外倾性内向人数
+    ,synthesis_1_neutral_num -- 综合外倾性中性人数
+    ,synthesis_1_extroversion_num -- 综合外倾性外向人数
+    ,coalesce(synthesis_1_introversion_num/sub_count,0) as synthesis_1_introversion_rate-- 综合外倾性内向占比
+    ,coalesce(synthesis_1_neutral_num/sub_count,0) as synthesis_1_neutral_rate-- 综合外倾性中性占比
+    ,coalesce(synthesis_1_extroversion_num/sub_count,0) as synthesis_1_extroversion_rate-- 综合外倾性外向占比
+    ,synthesis_5_pragmatic_num -- 综合开放性务实人数
+    ,synthesis_5_neutral_num -- 综合开放性中性人数
+    ,synthesis_5_create_num -- 综合开放性创造人数
+    ,coalesce(synthesis_5_pragmatic_num/sub_count,0) as synthesis_5_pragmatic_rate -- 综合开放性务实占比
+    ,coalesce(synthesis_5_neutral_num/sub_count,0) as synthesis_5_neutral_rate  -- 综合开放性中性占比
+    ,coalesce(synthesis_5_create_num/sub_count,0) as synthesis_5_create_rate  -- 综合开放性创造占比
+    ,synthesis_9_strict_num -- 综合宜人性严格人数
+    ,synthesis_9_neutral_num -- 综合宜人性中性人数
+    ,synthesis_9_broad_num -- 综合宜人性宽容人数
+    ,coalesce(synthesis_9_strict_num/sub_count,0) as synthesis_9_strict_rate -- 综合宜人性严格占比
+    ,coalesce(synthesis_9_neutral_num/sub_count,0) as synthesis_9_neutral_rate -- 综合宜人性中性占比
+    ,coalesce(synthesis_9_broad_num/sub_count,0) as synthesis_9_broad_rate -- 综合宜人性宽容占比
+    ,synthesis_13_casual_num  -- 综合责任心随性人数
+    ,synthesis_13_neutral_num -- 综合责任心中性人数
+    ,synthesis_13_order_num  -- 综合责任心有序人数
+    ,coalesce(synthesis_13_casual_num/sub_count,0) as synthesis_13_casual_rate-- 综合责任心随性占比
+    ,coalesce(synthesis_13_neutral_num/sub_count,0) as synthesis_13_neutral_rate-- 综合责任心中性占比
+    ,coalesce(synthesis_13_order_num/sub_count,0) as synthesis_13_order_rate-- 综合责任心有序占比
+    ,synthesis_17_stable_num -- 综合情绪稳定性稳定人数
+    ,synthesis_17_neutral_num -- 综合情绪稳定性中性人数
+    ,synthesis_17_rich_num  -- 综合情绪稳定性丰富人数
+    ,coalesce(synthesis_17_stable_num/sub_count,0) as synthesis_17_stable_rate -- 综合情绪稳定性稳定占比
+    ,coalesce(synthesis_17_neutral_num/sub_count,0) as synthesis_17_neutral_rate -- 综合情绪稳定性中性占比
+    ,coalesce(synthesis_17_rich_num/sub_count,0) as synthesis_17_rich_rate -- 综合情绪稳定性丰富占比
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date -- 跑数时间
+from
+(
+   select
+        class_id -- 班级id
+       ,max(class_name) as  class_name -- 班级名称
+       ,grade_id-- 年级id
+       ,max(grade_name) as grade_name-- 年级名称
+       ,org_id-- 学校id
+       ,max(org_name) as org_name -- 学校名称
+       ,org_area_id-- 学校区县id
+       ,max(org_area_name) as org_area_name -- 学校县区名称
+       ,count(student_id) as sub_count-- 学生人数
+       ,sum(case when mens_t_score_1 is not null or mens_t_score_5 is not null 
+                    or mens_t_score_9 is not null or mens_t_score_13 is not null 
+       			 or mens_t_score_17 is not null then 1 else 0 end ) as measurement_num -- 量表测量人数
+       ,sum(case when mode_type_score_1 is not null or mode_type_score_5 is not null 
+                    or mode_type_score_9 is not null or mode_type_score_13 is not null 
+       			 or mode_type_score_17 is not null then 1 else 0 end ) as disposition_num -- 绘画分析测量人数
+       ,sum(case when synthesis_score_1 is not null and synthesis_score_1 >= 0 and synthesis_score_1 <= 30  then 1 else 0 end ) as synthesis_1_introversion_num -- 综合外倾性内向人数
+       ,sum(case when synthesis_score_1 is not null and synthesis_score_1 >= 31 and synthesis_score_1 <= 69 then 1 else 0 end ) as synthesis_1_neutral_num -- 综合外倾性中性人数
+       ,sum(case when synthesis_score_1 is not null and synthesis_score_1 >= 70 and synthesis_score_1 <= 100 then 1 else 0 end ) as synthesis_1_extroversion_num -- 综合外倾性外向人数
+       ,sum(case when synthesis_score_5 is not null and synthesis_score_5 >= 0 and synthesis_score_5 <= 30 then 1 else 0 end ) as synthesis_5_pragmatic_num  -- 综合开放性务实人数
+       ,sum(case when synthesis_score_5 is not null and synthesis_score_5 >= 31 and synthesis_score_5 <= 69 then 1 else 0 end ) as synthesis_5_neutral_num  -- 综合开放性中性人数
+       ,sum(case when synthesis_score_5 is not null and synthesis_score_5 >= 70 and synthesis_score_5 <= 100 then 1 else 0 end ) as synthesis_5_create_num  -- 综合开放性创造人数
+       ,sum(case when synthesis_score_9 is not null and synthesis_score_9 >= 0  and synthesis_score_9 <= 30 then 1 else 0 end ) as synthesis_9_strict_num -- 综合宜人性严格人数
+       ,sum(case when synthesis_score_9 is not null and synthesis_score_9 >= 31 and synthesis_score_9 <= 69 then 1 else 0 end ) as synthesis_9_neutral_num  -- 综合宜人性中性人数
+       ,sum(case when synthesis_score_9 is not null and synthesis_score_9 >= 70 and synthesis_score_9 <= 100 then 1 else 0 end ) as synthesis_9_broad_num  -- 综合宜人性宽容人数
+       ,sum(case when synthesis_score_13 is not null and synthesis_score_13 >= 0  and synthesis_score_13 <= 30 then 1 else 0 end ) as  synthesis_13_casual_num   -- 综合责任心随性人数
+       ,sum(case when synthesis_score_13 is not null and synthesis_score_13 >= 31 and synthesis_score_13 <= 69 then 1 else 0 end ) as  synthesis_13_neutral_num  -- 综合责任心中性人数
+       ,sum(case when synthesis_score_13 is not null and synthesis_score_13 >= 70 and synthesis_score_13 <= 100 then 1 else 0 end ) as synthesis_13_order_num   -- 综合责任心有序人数
+       ,sum(case when synthesis_score_17 is not null and synthesis_score_17 >= 0  and synthesis_score_17 <= 30 then 1 else 0 end ) as  synthesis_17_stable_num   -- 综合情绪稳定性稳定人数
+       ,sum(case when synthesis_score_17 is not null and synthesis_score_17 >= 31 and synthesis_score_17 <= 69 then 1 else 0 end ) as  synthesis_17_neutral_num  -- 综合情绪稳定性中性人数
+       ,sum(case when synthesis_score_17 is not null and synthesis_score_17 >= 70 and synthesis_score_17 <= 100 then 1 else 0 end ) as synthesis_17_rich_num    -- 综合情绪稳定性丰富人数
+   from dwh_dw_campus.clife_campus_dwd_disposition_stu_info
+   where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+   group by class_id,grade_id,org_id,org_area_id
+)t
+
+
+===========================
+    clife_campus_dws_classroom_env_converge
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_classroom_env_converge partition(part_date)
+select 
+     grade_id    -- ’年级id'
+    ,max(grade_name) as grade_name  -- '年级名称'
+    ,org_id      --'学校id'
+    ,max(org_name) as org_name    --'学校名称'
+    ,org_area_id --'学校区县id'
+    ,max(org_area_name) as org_area_name  --'学校区县名称'
+    ,sum(case when intds_result = '优' then 1 else 0 end ) as intds_high_num --原水水质优数量
+    ,sum(case when intds_result = '良' then 1 else 0 end ) as intds_middle_num  --原水水质良数量
+    ,sum(case when intds_result = '合格' then 1 else 0 end ) as  intds_qualified_num--原水水质合格数量
+    ,sum(case when intds_result = '一般' then 1 else 0 end ) as  intds_general_num--原水水质一般数量
+    ,sum(case when outtds_result = '极佳' then 1 else 0 end ) as outtds_high_num --出水水质优数量
+    ,sum(case when outtds_result = '优秀' then 1 else 0 end ) as outtds_middle_num  --出水水质良数量
+    ,sum(case when outtds_result = '良好' then 1 else 0 end ) as  outtds_qualified_num --出水水质合格数量
+    ,sum(case when outtds_result = '一般' then 1 else 0 end ) as  outtds_general_num --出水水质一般数量
+    ,sum(case when outtds_result = '有待改善' then 1 else 0 end ) as  outtds_need_improve_num --出水水质有待改善数量
+    ,sum(case when pm25_result = '优' then 1 else 0 end ) as  pm25_0_35_num  --PM2.5优数量
+    ,sum(case when pm25_result = '良' then 1 else 0 end ) as  pm25_36_75_num  --PM2.5良数量
+    ,sum(case when pm25_result = '轻度' then 1 else 0 end ) as  pm25_76_115_num  --PM2.5轻度数量
+    ,sum(case when pm25_result = '中度' then 1 else 0 end ) as  pm25_116_150_num  --PM2.5中度数量
+    ,sum(case when pm25_result = '重度' then 1 else 0 end ) as  pm25_151_250_num  --PM2.5重度数量
+    ,sum(case when air_exhaust_result = '寒冷' then 1 else 0 end ) as  air_exhaust_5_num  --温度寒冷数量
+    ,sum(case when air_exhaust_result = '较冷' then 1 else 0 end ) as  air_exhaust_6_18_num  --湿度较冷数量
+    ,sum(case when air_exhaust_result = '适宜' then 1 else 0 end ) as  air_exhaust_19_28_num  --湿度适宜数量
+    ,sum(case when air_exhaust_result = '较热' then 1 else 0 end ) as  air_exhaust_29_32_num  --湿度较热数量
+    ,sum(case when air_exhaust_result = '炎热' then 1 else 0 end ) as  air_exhaust_33_num  --湿度炎热数量
+    ,sum(case when air_exhausthum_result = '干燥' then 1 else 0 end ) as  air_exhausthum_0_40_num  --湿度干燥数量
+    ,sum(case when air_exhausthum_result = '适宜' then 1 else 0 end ) as  air_exhausthum_41_75_num  --湿度适宜数量
+    ,sum(case when air_exhausthum_result = '湿润' then 1 else 0 end ) as  air_exhausthum_76_100_num  --湿度湿润数量
+    ,sum(case when co2_result = '优' then 1 else 0 end ) as  co2_0_450_num  --CO2优数量
+    ,sum(case when co2_result = '良' then 1 else 0 end ) as  co2_451_800_num  --CO2良数量
+    ,sum(case when co2_result = '轻度' then 1 else 0 end ) as  co2_801_1200_num  --CO2轻度数量
+    ,sum(case when co2_result = '中度' then 1 else 0 end ) as  co2_1201_2000_num  --CO2中度数量
+    ,sum(case when co2_result = '重度' then 1 else 0 end ) as  co2_2001_num  --CO2重度数量
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from dwh_dw_campus.clife_campus_dwd_classroom_env_info
+where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+group by grade_id,org_id,org_area_id
+
+
+===========================
+    clife_campus_dws_drink_water_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_drink_water_data  partition(part_date)
+select 
+   t2.student_id           -- '学生唯一标识'
+  ,t2.student_name              -- '姓名'
+  ,t2.sex              -- '1-男 2-女 3-其他'
+  ,t2.age              --  '年龄'
+  ,t2.class_id              -- '班级id'
+  ,t2.class_name              -- '班级名称'
+  ,t2.grade_id              -- '年级id'
+  ,t2.grade_name              -- '年级名称'
+  ,t2.org_id              -- '学校id'
+  ,t2.org_name              -- '学校名称'
+  ,t2.area_id		     -- '区县id'
+  ,t2.sum_drink              -- '总飲水量'
+  ,t2.no_drink              --'飲水人數' 
+  ,t2.am_status              -- '是否入园'  
+  ,case when t3.data_id is not null and t2.am_status=1 and (t2.sum_drink is null or t2.sum_drink<t3.standard) then 0 --'不足'
+        when t3.data_id is not null and t2.am_status=1 and t2.sum_drink>=t3.standard  and t2.sum_drink<t3.enough then 1 --'达标'
+		when t3.data_id is not null and t2.am_status=1 and t2.sum_drink>=t3.enough  then 2 --'充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and t2.grade_id = 5 and (t2.sum_drink is null or t2.sum_drink<4) then 0 --'托班杯数不足'
+		when t3.data_id is null and t2.am_status=1  and t2.device_type = 0 and t2.grade_id = 5 and t2.sum_drink<6 and t2.sum_drink>=4 then 1 --'托班杯数达标'
+		when t3.data_id is null and t2.am_status=1  and t2.device_type = 0 and t2.grade_id = 5 and  t2.sum_drink>=6  then 2 --'托班杯数充足'
+		when t3.data_id is null and t2.am_status=1  and t2.device_type = 0 and t2.grade_id = 6 and (t2.sum_drink is null or t2.sum_drink<5) then 0 --'小班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and t2.grade_id = 6 and t2.sum_drink<7 and t2.sum_drink>=5 then 1 --'小班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and t2.grade_id = 6 and t2.sum_drink>=7  then 2 --'小班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and (t2.grade_id = 7 or t2.grade_id = 8) and (t2.sum_drink is null or t2.sum_drink<6) then 0 --'中班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and (t2.grade_id = 7 or t2.grade_id = 8) and t2.sum_drink<8 and t2.sum_drink>=6 then 1 --'中班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and (t2.grade_id = 7 or t2.grade_id = 8) and t2.sum_drink>=8  then 2 --'中班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and t2.grade_id = 9 and (t2.sum_drink is null or t2.sum_drink<8) then 0 --'学前班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and t2.grade_id = 9 and t2.sum_drink<10 and t2.sum_drink>=8 then 1 --'学前班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 0 and t2.grade_id = 9 and t2.sum_drink>=10  then 2 --'学班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 5 and (t2.sum_drink is null or t2.sum_drink<400) then 0 --'托班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 5 and t2.sum_drink<600 and t2.sum_drink>=400 then 1 --'托班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 5 and t2.sum_drink>=600  then 2 --'托班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 6 and (t2.sum_drink is null or t2.sum_drink<450) then 0 --'小班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 6 and t2.sum_drink<650 and t2.sum_drink>=450 then 1 --'小班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 6 and t2.sum_drink>=650  then 2 --'小班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 7 and (t2.sum_drink is null or t2.sum_drink<550) then 0 --'小班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 7 and t2.sum_drink<750 and t2.sum_drink>=550 then 1 --'小班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 7 and t2.sum_drink>=750  then 2 --'小班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 8 and (t2.sum_drink is null or t2.sum_drink<600) then 0 --'小班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 8 and t2.sum_drink<800 and t2.sum_drink>=600 then 1 --'小班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 8 and t2.sum_drink>=800  then 2 --'小班杯数充足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 9 and (t2.sum_drink is null or t2.sum_drink<750) then 0 --'学前班杯数不足'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 9 and t2.sum_drink<950 and t2.sum_drink>=750 then 1 --'学前班杯数达标'
+		when t3.data_id is null and t2.am_status=1 and t2.device_type = 1 and t2.grade_id = 9 and t2.sum_drink>=950  then 2 --'学班杯数充足'
+		else null 
+	end  as standard_status
+  ,regexp_replace(date_sub(current_date(),1),'-','')
+from 
+  ( 
+	select
+	    t1.student_id student_id
+	    ,max(t1.student_name)  student_name     -- '姓名'
+	    ,max(t1.sex)   sex                      -- '1-男 2-女 3-其他'
+	    ,max(t1.age)    age                     -- '年龄'
+	    ,max(t1.class_id)   class_id            -- '班级id'
+	    ,max(t1.class_name)    class_name       -- '班级名称'
+	    ,max(t1.grade_id)   grade_id            -- '年级id'
+	    ,max(t1.grade_name)   grade_name        -- '年级名称'
+	    ,max(t1.org_id)     org_id              -- '学校id'
+	    ,max(t1.org_name)     org_name          -- '学校名称'
+	    ,max(t1.area_id) 		area_id		     -- '区县id'
+	    ,cast(sum(t1.water_amount) as Decimal(10,2)) sum_drink  -- '饮水总量'
+	    ,count(t1.water_amount) no_drink        -- '饮水次数'
+	    ,max(t1.am_status)     am_status  
+	    ,max(t1.device_type)   device_type  
+	from 
+	   (
+		select 
+		  a.student_id                 -- '学生唯一标识'
+		  ,a.student_name               -- '姓名'
+		  ,a.sex                        -- '1-男 2-女 3-其他'
+		  ,a.age                        --  '年龄'
+		  ,a.class_id                   -- '班级id'
+		  ,a.class_name                 -- '班级名称'
+		  ,a.grade_id                   -- '年级id'
+		  ,a.grade_name                 -- '年级名称'
+		  ,a.org_id                     -- '学校id'
+		  ,a.org_name                   -- '学校名称'
+		  ,a.area_id 				     -- '区县id'
+		  ,t.water_amount  
+		  ,case when b.student_id is null then 0 else 1 end am_status
+		  ,case when t.device_type = 4 then 0 else 1 end device_type
+		from 
+		  dwh_dw_campus.clife_campus_dim_student a 
+		left join 
+		  dwh_dw_campus.clife_campus_dim_into_campus_detail b 
+		  on a.student_id=b.student_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','') and b.am_status = 1 and substr(data_time,0,10) = date_sub(current_date(),1)   
+		left join 
+		  dwh_dw_campus.clife_campus_dwd_water_drink_info t
+		 on a.student_id=t.student_id and   t.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+		where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')  and a.deleted=1 and a.status=1
+	 )t1
+	group by t1.student_id
+   )t2
+left join 
+dwh_dw_campus.clife_campus_dim_water_drink_setting t3
+on t2.org_id=t3.org_id and t2.grade_id=t3.grade_id and t3.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+
+===========================
+    clife_campus_dws_thermometer_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_thermometer_data  partition(part_date)
+select
+     b.student_id          -- '学生id'  
+    ,b.student_name        -- '姓名'
+    ,b.sex                 -- '性别'
+    ,b.age                 -- '年龄'
+    ,b.class_id            -- '班级id'
+    ,b.class_name          -- '班级名称'
+    ,b.grade_id            -- '年级id'
+    ,b.grade_name          -- '年级名称'
+    ,b.org_id              -- '学校id'
+    ,b.org_name            -- '学校名称'
+    ,b.area_id             -- '区县id'
+    ,b.no_measure          -- '测量测数'
+    ,b.no_low_fever        -- '低烧次数'
+    ,b.no_normal           -- '正常次数'
+    ,b.no_high_fever       -- '高热次数'
+    ,c.level --每天最新的状态
+    ,c.value --每天最新的值
+    ,regexp_replace(date_sub(current_date(),1),'-','')
+from 
+(
+   select 
+        t2.student_id student_id
+       ,max(t2.student_name)  student_name     -- '姓名'
+       ,max(t2.sex)   sex                      -- '1-男 2-女 3-其他'
+       ,max(t2.age)    age                     -- '年龄'
+       ,max(t2.class_id)   class_id            -- '班级id'
+       ,max(t2.class_name)    class_name       -- '班级名称'
+       ,max(t2.grade_id)   grade_id            -- '年级id'
+       ,max(t2.grade_name)   grade_name        -- '年级名称'
+       ,max(t2.org_id)     org_id              -- '学校id'
+       ,max(t2.org_name)     org_name          -- '学校名称'
+       ,max(t2.area_id) 		area_id		     -- '区县id'
+       ,case when count(t2.level) is not null  then count(t2.level) else 0 end as no_measure  --测量测数
+       ,sum(no_normal)     as no_normal        --'正常次数'
+       ,sum(no_low_fever)  as no_low_fever     --'低热次数'
+       ,sum(no_high_fever) as no_high_fever    --'高热次数'
+   from
+   (
+     select
+          t.student_id 
+         ,t.student_name    -- '姓名'a
+         ,t.sex               -- '1-男 2-女 3-其他'
+         ,t.age             -- '年龄'
+         ,t.class_id        -- '班级id'
+         ,t.class_name      -- '班级名称'
+         ,t.grade_id        -- '年级id'
+         ,t.grade_name      -- '年级名称'
+         ,t.org_id          -- '学校id'
+         ,t.org_name        -- '学校名称'
+         ,t.area_id	     -- '区县id'
+         ,t.level 
+         ,case when level = 0 or level = 1 then 1 else 0 end as  no_normal --正常次数
+         ,case when level = 2 then 1 else 0 end as  no_low_fever           --'低热次数'
+         ,case when level = 3 then 1 else 0 end as  no_high_fever          --'高热次数'
+     from dwh_dw_campus.clife_campus_dwd_thermometer_info t
+     where t.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+   )t2
+   group by student_id 
+) b
+left join 
+(	 
+   select b2.* 
+   from 
+   (
+      select 
+           b1.*
+	      ,row_number() over(partition by student_id order by upload_time desc) as ranks
+	  from dwh_dw_campus.clife_campus_dwd_thermometer_info  b1 
+	  where b1.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+	) b2 
+	where b2.ranks=1
+) c on b.student_id=c.student_id
+
+
+===========================
+    clife_campus_dws_attendance_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_attendance_data  partition(part_date)
+ select 
+   t2.class_id, --班级ID
+   class_name,  --班级名称
+   grade_id,  --年级ID
+   grade_name, --年级名称
+   org_id,   --学校ID
+   org_name,  --学校名称
+   area_id,   --县区ID
+   case when no_student is null then 0 else no_student end as no_student, --学生人数
+   case when no_attendance is null then 0 else no_attendance end as no_attendance,  --出勤人数
+   case when no_absenteeism is null then 0 else no_absenteeism end as no_absenteeism,  --缺勤人数
+   case when attendance is null then 0 else attendance end as attendance, --出勤率
+   case when absenteeism is null then 0 else absenteeism end as absenteeism,  --缺勤率
+   no_affair_leave, --事假人数
+   no_sick_leave, --病假人数
+   no_leave,--请假人数
+   cast(no_affair_leave/no_student as Decimal(15,2)) percent_affair_leave, --事假占比
+   cast(no_sick_leave/no_student as Decimal(15,2)) percent_sick_leave, --病假占比
+   data_time, --数据日期
+   regexp_replace(date_sub(current_date(),1),'-','')
+ from 
+     ( 
+	   select 
+		   max(t1.class_id)   class_id            -- '班级id'
+		  ,max(t1.class_name) class_name       -- '班级名称'
+		  ,max(t1.grade_id)   grade_id            -- '年级id'
+		  ,max(t1.grade_name) grade_name        -- '年级名称'
+		  ,max(t1.org_id)     org_id              -- '学校id'
+		  ,max(t1.org_name)     org_name          -- '学校名称'
+		  ,max(t1.area_id) 		area_id		      -- '区县id'
+		  ,count(t1.no_attendance) no_attendance --出勤人数
+		  ,count(t1.no_absenteeism) no_absenteeism --未入园人数
+		  ,cast(count(no_attendance)/(count(no_attendance)+count(no_absenteeism)) as Decimal(15,2)) attendance    --出勤率   
+		  ,cast(count(no_absenteeism)/(count(no_attendance)+count(no_absenteeism)) as Decimal(15,2)) absenteeism  --未入园率
+		  ,count(no_affair_leave) no_affair_leave--事假人数
+          ,count(no_sick_leave) no_sick_leave--病假人数
+          ,count(no_affair_leave)+count(no_sick_leave) no_leave --请假人数
+		  ,t1.data_time
+		from 
+			( select 
+			 	  t.class_id        -- '班级id'
+				  ,t.class_name      -- '班级名称'
+				  ,t.grade_id        -- '年级id'
+				  ,t.grade_name      -- '年级名称'
+				  ,t.org_id          -- '学校id'
+				  ,t.org_name        -- '学校名称'
+				  ,t.area_id	     -- '区县id'
+				  ,substr(t.data_time,0,10) data_time
+				  ,case when `result` = 1 then 1 end as no_attendance --出勤人数
+				  ,case when `result` = 2 or `result` = 5 then 1 end as no_absenteeism --未入园人数
+				  ,case when `result` = 3 then 1 end as no_sick_leave --病假人数
+		          ,case when `result` = 4 then 1 end as no_affair_leave --事假人数
+			  from 
+				 dwh_dw_campus.clife_campus_dwd_student_attendance_info t
+			  where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+		    )t1 
+		group by t1.class_id,data_time
+     )t2 
+     left join 
+    (    
+      select count(student_id) no_student,class_id
+      from dwh_dw_campus.clife_campus_dim_student b 
+      where b.status=1 and b.deleted=1 and  part_date = regexp_replace(date_sub(current_date(),1),'-','')
+      group by class_id
+    )t3
+    on(t3.class_id = t2.class_id)
+
+
+===========================
+    clife_campus_dws_inspection_stu
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_inspection_stu  partition(part_date)
+select 
+ t1.student_id        -- '学生id'
+,t1.student_name      -- '姓名'
+,t1.sex               -- '性别'
+,t1.age               -- '年龄'
+,t1.class_id          -- '班级id'
+,t1.class_name        -- '班级名称'
+,t1.grade_id          -- '年级id'
+,t1.grade_name        -- '年级名称'
+,t1.org_id            -- '学校id'
+,t1.org_name          -- '学校名称'
+,t1.org_area_id       -- '学校县区id'
+,t1.am_check_cnt      -- '晨检次数'
+,t1.pm_check_cnt      -- '午检次数'
+,t1.inspection_date   -- '检查日期'
+,t2.is_abnormal       -- '检查结果异常次数'
+,t2.fever             -- '发热'
+,t2.throat            -- '咽部红肿'
+,t2.hfmd              -- '疑似手口足病'
+,t2.abnormal_rash     -- '异常皮疹'
+,t2.cough             -- '咳嗽'
+,t2.runny_nose        -- '流涕'
+,t2.rash              -- '皮疹'
+,t2.vomit             -- '呕吐'
+,t2.conjunctival      -- '结膜充血，分泌物多'
+,t2.nose_bleeding     -- '流鼻血'
+,t2.trauma            -- '外伤'
+,t2.diarrhea          -- '腹泻'
+,t2.cheek             -- '腮腺肿大' 
+,t2.hand              -- '手部异常'
+,t2.mouth             -- '口腔异常'
+,t2.red_eye           -- '红眼'
+,t2.spirit            -- '精神不佳'
+,t2.fingernail        -- '指甲过长'
+,t2.contagion_ids     -- '传染病ids'
+,t2.influenza        -- '流行性感冒'
+,t2.rubella    -- '风疹'
+,t2.contagion_diarrhea          -- '感染性腹泻'
+,t2.contagion_hfmd  -- '手口足病'
+,t2.dysentery  -- '痢疾'
+,t2.other_contagions    -- '其他传染病'
+,case when t2.other_symptom='' then null else t2.other_symptom end  other_symptom    -- '其他症状'
+,regexp_replace(date_sub(current_date(),1),'-','')
+from 
+(
+select 
+a.student_id         -- '学生id'
+,max(a.student_name)   student_name   -- '姓名'
+,max(a.sex)            sex   -- '性别'
+,max(a.age)            age  -- '年龄'
+,max(a.class_id)       class_id   -- '班级id'
+,max(a.class_name)     class_name   -- '班级名称'
+,max(a.grade_id)       grade_id   -- '年级id'
+,max(a.grade_name)     grade_name   -- '年级名称'
+,max(a.org_id)         org_id   -- '学校id'
+,max(a.org_name)       org_name   -- '学校名称'
+,max(a.org_area_id)    org_area_id   -- '学校县区id'
+,count(am_check)       am_check_cnt   --'晨检次数'
+,count(pm_check)       pm_check_cnt   --'午检次数'
+,a.inspection_date     inspection_date  --'检查日期'
+from 
+(
+select 
+ student_id        -- '学生id'
+,student_name      -- '姓名'
+,sex               -- '性别'
+,age               -- '年龄'
+,class_id          -- '班级id'
+,class_name        -- '班级名称'
+,grade_id          -- '年级id'
+,grade_name        -- '年级名称'
+,org_id            -- '学校id'
+,org_name          -- '学校名称'
+,org_area_id       -- '学校县区id'
+,case when type=0 then inspection_id else null end am_check   --'晨检'
+,case when type=1 then inspection_id else null end pm_check   --'午检'
+,inspection_date   -- '检查日期'
+from dwh_dw_campus.clife_campus_dwd_inspection_stu 
+where part_date=regexp_replace(date_sub(current_date(),1),'-','') and deleted=1
+)  a 
+group by a.student_id,a.inspection_date
+)  t1 
+left join 
+(
+select 
+b.student_id
+,b.inspection_date   -- '检查日期'
+,sum(b.is_abnormal)   is_abnormal    -- '检查结果异常次数'
+,sum(b.fever)         fever          -- '发热'
+,sum(b.throat)        throat         -- '咽部红肿'
+,sum(b.hfmd)          hfmd           -- '疑似手口足病'
+,sum(b.abnormal_rash) abnormal_rash    -- '异常皮疹'
+,sum(b.cough)         cough           -- '咳嗽'
+,sum(b.runny_nose)    runny_nose    -- '流涕'
+,sum(b.rash)          rash          -- '皮疹'
+,sum(b.vomit)         vomit         -- '呕吐'
+,sum(b.conjunctival)  conjunctival    -- '结膜充血，分泌物多'
+,sum(b.nose_bleeding) nose_bleeding    -- '流鼻血'
+,sum(b.trauma)        trauma    -- '外伤'
+,sum(b.diarrhea)      diarrhea    -- '腹泻'
+,sum(b.cheek)         cheek    -- '腮腺肿大' 
+,sum(b.hand)          hand    -- '手部异常'
+,sum(b.mouth)         mouth    -- '口腔异常'
+,sum(b.red_eye)       red_eye    -- '红眼'
+,sum(b.spirit)        spirit    -- '精神不佳'
+,sum(b.fingernail)    fingernail    -- '指甲过长'
+,concat_ws(',',collect_set(contagion_ids)) as contagion_ids --'传染病ids'
+,sum(b.influenza)     influenza        -- '流行性感冒'
+,sum(b.rubella)       rubella    -- '风疹'
+,sum(b.contagion_diarrhea)  contagion_diarrhea          -- '感染性腹泻'
+,sum(b.contagion_hfmd)      contagion_hfmd  -- '手口足病'
+,sum(b.dysentery)           dysentery  -- '痢疾'
+,sum(b.other_contagions)    other_contagions    -- '其他传染病'
+,concat_ws(',',collect_set(b.other_symptom))   other_symptom  -- '其他症状'
+ from (
+select 
+a.student_id
+,a.inspection_date   -- '检查日期'
+,case when a.is_abnormal =0 then 1 when a.is_abnormal =1 then 0 else 0 end   is_abnormal -- '检查结果异常次数 '
+,a.fever          -- '发热'
+,a.throat         -- '咽部红肿'
+,a.hfmd           -- '疑似手口足病'
+,a.abnormal_rash    -- '异常皮疹'
+,a.cough           -- '咳嗽'
+,a.runny_nose    -- '流涕'
+,a.rash          -- '皮疹'
+,a.vomit         -- '呕吐'
+,a.conjunctival    -- '结膜充血，分泌物多'
+,a.nose_bleeding    -- '流鼻血'
+,a.trauma    -- '外伤'
+,a.diarrhea    -- '腹泻'
+,a.cheek    -- '腮腺肿大' 
+,a.hand    -- '手部异常'
+,a.mouth    -- '口腔异常'
+,a.red_eye    -- '红眼'
+,a.spirit    -- '精神不佳'
+,a.fingernail    -- '指甲过长'
+,a.contagions as contagion_ids   --'传染病ids'
+,a.influenza        -- '流行性感冒'
+,a.rubella    -- '风疹'
+,a.contagion_diarrhea          -- '感染性腹泻'
+,a.contagion_hfmd  -- '手口足病'
+,a.dysentery  -- '痢疾'
+,a.other_contagions    -- '其他传染病'
+,a.other_symptom  -- '其他症状'
+,row_number() over(partition by student_id,type,inspection_date order by update_time desc) as ranks
+ from dwh_dw_campus.clife_campus_dwd_inspection_stu a
+ where part_date=regexp_replace(date_sub(current_date(),1),'-','') and deleted=1 ) b where b.ranks=1
+ group by b.student_id,b.inspection_date
+)  t2
+on t1.student_id=t2.student_id and t1.inspection_date=t2.inspection_date
+
+
+===========================
+    clife_campus_dws_medicine_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_medicine_data partition(part_date)
+select 
+    class_id                                                                   ,  -- 班级id
+    max(class_name               )               as class_name                 ,  -- 班级名称
+    max(grade_id                 )               as grade_id                   ,  -- 年级id
+    max(grade_name               )               as grade_name                 ,  -- 年级名称
+    max(org_id                   )               as org_id                     ,  -- 学校id
+    max(org_name                 )               as org_name                   ,  -- 学校名称
+    max(area_id                  )               as area_id                    ,  -- 学校区县id
+    sum(uncomplete_medicine_cnt  )               as uncomplete_medicine_cnt    ,  -- 班级未喂药次数（人次）                       
+    sum(complete_medicine_cnt    )               as complete_medicine_cnt      ,  -- 班级已喂药次数（人次）                       
+    sum(total_cnt                )               as total_cnt                  ,  -- 班级总共喂药次数（人次）                       
+    sum(am_cnt                   )               as am_cnt                     ,  -- 班级早上喂药次数（人次）                     
+    sum(mid_cnt                  )               as mid_cnt                    ,  -- 班级中午喂药次数（人次）
+    count(student_id)                            as medicine_person_cnt        ,  -- 班级喂药总人数（包含未喂药和已喂药状态）
+    sum(case am_status when 0 then 1 else 0 end) as medicine_person_in_cnt     ,  -- 班级喂药总人数（包含未喂药和已喂药状态，未入园）       
+    sum(case am_status when 1 then 1 else 0 end) as medicine_person_out_cnt    ,  -- 班级喂药总人数（包含未喂药和已喂药状态，已入园）       
+    medication_part_date                                                       ,  -- 跑数日期
+    part_date       -- 跑数日期
+from dwh_dw_campus.clife_campus_dwd_medicine_data 
+where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+group by class_id, medication_part_date,part_date
+
+
+===========================
+    clife_campus_dws_intocampus_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_intocampus_data  partition(part_date)
+select
+ a.class_id      -- '班级id'
+,a.class_name    -- '班级名称'
+,a.grade_id      -- '年级id'
+,a.grade_name    -- '年级名称'
+,a.org_id        -- '学校id'
+,a.org_name      -- '学校名称'
+,a.area_id	   -- '区县id'
+,coalesce(b.student_cnt,0)  as student_cnt     --班级总学生人数
+,a.intocampus_num    --入园人数 
+,a.no_intocampus_num --未入园人数 
+,coalesce(a.intocampus_num/b.student_cnt,0)    as intocampus_rate    --入园率
+,coalesce(a.no_intocampus_num/b.student_cnt,0) as no_intocampus_rate   --未入园率
+,a.affair_leave_num  --请事假人数
+,a.sick_leave_num    --请病假人数
+,coalesce(a.sick_leave_num+a.affair_leave_num,0)  as leave_num         --请假人数
+,coalesce(a.affair_leave_num/b.student_cnt,0)     as affair_leave_rate --请事假人数占比
+,coalesce(a.sick_leave_num/b.student_cnt,0)       as sick_leave_rate   --请病假人数占比
+,a.data_time  --数据日期
+,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from 
+( 
+  select 
+       t.class_id                         -- '班级id'
+      ,max(t.class_name) as class_name    -- '班级名称'
+      ,max(t.grade_id)   as grade_id      -- '年级id'
+      ,max(t.grade_name) as grade_name    -- '年级名称'
+      ,max(t.org_id)     as org_id        -- '学校id'
+      ,max(t.org_name)   as org_name      -- '学校名称'
+      ,max(t.area_id)    as area_id		  -- '区县id'
+      ,substr(t.data_time,0,10) data_time
+      ,sum(case when att_status = 0 then 1 else 0 end) as no_intocampus_num   --未入园人数
+      ,sum(case when att_status = 1 then 1 else 0 end) as intocampus_num      --入园人数
+      ,sum(case when att_status = 2 then 1 else 0 end) as sick_leave_num      --病假人数
+      ,sum(case when att_status = 3 then 1 else 0 end) as affair_leave_num    --事假人数
+  from dwh_dw_campus.clife_campus_dwd_student_intocampus_info t
+  where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+  group by t.class_id
+          ,substr(t.data_time,0,10)
+)a 
+left join 
+(    
+  select 
+       count(student_id) as student_cnt
+      ,class_id
+  from dwh_dw_campus.clife_campus_dim_student b 
+  where b.status=1 
+    and b.deleted = 1 
+    and part_date = regexp_replace(date_sub(current_date(),1),'-','')
+  group by class_id
+)b on a.class_id = b.class_id
+
+
+===========================
+    clife_campus_dws_shit_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_shit_data partition(part_date)
+select
+     class_id        --班级id
+    ,class_name      --班级名称
+    ,grade_id        --年级id
+    ,grade_name      --年级名称
+    ,org_id          --学校id
+    ,org_name        --学校名称
+    ,area_id         --学校区县id
+    ,student_cnt     --班级总人数
+    ,shit_num        --拉臭臭人数
+    ,(student_cnt-shit_num) as no_shit_num --未拉臭臭人数
+    ,into_campus_num    --入园人数
+    ,no_into_campus_num --未入园人数
+    ,date_time          --测量时间
+    ,regexp_replace(date_sub(current_date(),1),'-','')  as part_date
+from
+(
+  select
+       a.class_id                         --班级id
+      ,max(a.class_name) as class_name    --班级名称
+      ,max(a.grade_id)   as grade_id      --年级id
+      ,max(a.grade_name) as grade_name    --年级名称
+      ,max(a.org_id)     as org_id        --学校id
+      ,max(a.org_name)   as org_name      --学校名称
+      ,max(a.area_id)    as area_id       --学校区县id
+      ,max(b.student_cnt) as student_cnt  --班级总人数
+      ,sum(case when a.shit_cnt is not null or a.shit_cnt != 0 then 1 else 0 end ) as shit_num --拉臭臭人数
+      ,sum(case when a.att_status = 1 then 1 else 0 end ) as into_campus_num --入园人数
+      ,sum(case when a.att_status = 0 then 1 else 0 end ) as no_into_campus_num --未入园人数
+      ,a.date_time  --测量时间
+  from dwh_dw_campus.clife_campus_dwd_student_shit_info a
+  left join
+  (
+     select 
+         class_id
+        ,count(student_id) as student_cnt
+    from dwh_dw_campus.clife_campus_dim_student 
+    where status=1 
+      and deleted = 1 
+      and part_date = regexp_replace(date_sub(current_date(),1),'-','')
+    group by class_id
+  )b on a.class_id = b.class_id
+  where a.part_date = regexp_replace(date_sub(current_date(),1),'-','') 
+  group by a.class_id
+          ,a.date_time
+)e
+
+
+===========================
+    clife_campus_dws_push_message_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dws_push_message_data partition(part_date)
+select
+     class_id                            --班级id
+    ,class_name                          --班级名称
+    ,grade_id                            --年级id
+    ,grade_name                          --年级名称
+    ,org_id                              --学校id
+    ,org_name                            --学校名称
+    ,area_id                             --学校区县id
+    ,message_cnt                         --消息总数
+    ,user_num                            --推送用户次数
+    ,user_cnt                            --推送用户人数
+    ,parents_num                         --推送家长次数
+    ,parents_cnt                         --推送家长人数
+    ,student_cnt                         --学生人数
+    ,read_num                            --推送消息已读数
+    ,no_read_num                         --推送消息未读数
+    ,delete_num                          --推送消息删除数
+    ,ordinary_num                        --普通推送消息数
+    ,gardener_num                        --园丁端老师推送数
+    ,campus_num                          --校园运营端数
+    ,user_child_leave_num                --用户幼儿请假消息数
+    ,parents_child_leave_num             --家长幼儿请假消息数
+    ,inspection_num                      --幼儿晨午检消息数
+    ,child_report_num                    --宝宝报告消息数
+    ,device_num                          --智能设备管理消息数
+    ,teacher_incampus_num                --教职工出勤消息数
+    ,user_child_medicine_num             --用户幼儿喂药消息数
+    ,parents_child_medicine_num          --家长幼儿喂药消息数
+    ,child_incampus_num                  --幼儿入园出勤消息数
+    ,electronic_fence_num                --电子围栏消息数
+    ,parent_child_task_num               --亲子任务消息数
+    ,(user_cnt+parents_cnt) as push_all_num                                     --推送总人数
+    ,(user_child_leave_num+parents_child_leave_num) as child_leave_num          --幼儿请假消息数
+    ,(user_child_medicine_num+parents_child_medicine_num) as child_medicine_num --幼儿喂药消息数
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date             --分区时间
+from
+(
+  select
+       t.class_id                         --班级id
+      ,max(t.class_name) as class_name    --班级名称
+      ,t.grade_id      --年级id
+      ,max(t.grade_name) as grade_name    --年级名称
+      ,t.org_id        --学校id
+      ,max(t.org_name)   as org_name      --学校名称
+      ,max(t1.area_id) as area_id       --学校区县id
+      ,count(distinct t.message_id) as message_cnt --消息总数
+      ,sum(case when user_type=1 or user_type=3 then 1 else 0 end) as user_num --推送用户次数
+      ,count(distinct(case when user_type=1 or user_type=3 then user_id else null end)) as user_cnt --推送用户人数
+      ,sum(case when user_type=2 then 1 else 0 end) as parents_num --推送家长次数
+      ,count(distinct(case when user_type=2 then user_id else null end)) as parents_cnt --推送家长人数
+      ,count(distinct student_id) as student_cnt --学生人数
+      ,sum(case when t.status=2 then 1 else 0 end )as read_num --推送消息已读数
+      ,sum(case when t.status=1 then 1 else 0 end )as no_read_num --推送消息未读数
+      ,sum(case when t.status=0 then 1 else 0 end )as delete_num --推送消息删除数
+      ,sum(case when t.data_flag=0 then 1 else 0 end )as ordinary_num --普通推送消息数
+      ,sum(case when t.data_flag=1 then 1 else 0 end )as gardener_num --园丁端老师推送数
+      ,sum(case when t.data_flag=2 then 1 else 0 end )as campus_num --校园运营端数
+      ,count(distinct(case when t.message_type = 41000  and t.user_type = 1 then message_id else null end)) as user_child_leave_num    --用户幼儿请假消息数
+      ,count(distinct(case when t.message_type = 41000  and t.user_type = 2 then message_id else null end)) as parents_child_leave_num --家长幼儿请假消息数
+      ,count(distinct(case when t.message_type = 1141   and t.user_type = 2 then message_id else null end)) as inspection_num          --幼儿晨午检消息数
+      ,count(distinct(case when t.message_type = 60000  and t.user_type = 2 then message_id else null end)) as child_report_num        --宝宝报告消息数
+      ,count(distinct(case when t.message_type = 400    and t.user_type = 1 then message_id else null end)) as device_num              --智能设备管理消息数
+      ,count(distinct(case when t.message_type = 62000  and t.user_type = 1 then message_id else null end)) as teacher_incampus_num    --教职工出勤消息数
+      ,count(distinct(case when t.message_type = 15600  and t.user_type = 1 then message_id else null end)) as user_child_medicine_num    --用户幼儿喂药消息数
+      ,count(distinct(case when t.message_type = 15600  and t.user_type = 2 then message_id else null end)) as parents_child_medicine_num --家长幼儿喂药消息数
+      ,count(distinct(case when t.message_type = 110000 and t.user_type = 2 then message_id else null end)) as child_incampus_num         --幼儿入园出勤消息数
+      ,count(distinct(case when t.message_type = 63000  and t.user_type = 1 then message_id else null end)) as electronic_fence_num       --电子围栏消息数
+      ,count(distinct(case when t.message_type = 170000 and t.user_type = 2 then message_id else null end)) as parent_child_task_num      --亲子任务消息数
+  from
+  (
+    select
+         data_id         --   '自增主键'
+        ,user_id         --   '用户id'
+        ,user_name       --   '用户名'
+        ,student_id      --   '学生id'
+        ,student_name    --   '学生名'
+        ,org_id          --   '机构id'
+        ,message_id      --   '消息id'
+        ,status          --   '消息状态（0-删除，1-未读，2-已读）'
+        ,user_type       --   '用户类型'
+        ,create_time     --   '创建时间'
+        ,update_time     --   '更新时间'
+        ,org_name        --   '学校名称'
+        ,ip.grade_idi   as grade_id    --   '年级'
+        ,ip.grade_namei as grade_name  --   '年级名称'
+        ,ip.class_idi   as class_id    --   '班级'
+        ,ip.class_namei as class_name  --   '班级名称'
+        ,data_flag
+        ,message_type
+    from dwh_dw_campus.clife_campus_dwd_push_message_info
+    lateral view explodemulti(if(grade_id is null,'',grade_id),if(grade_name is null,'',grade_name),if(class_id is null,'',class_id),if(class_name is null,'',class_name)) ip as grade_idi,grade_namei,class_idi,class_namei
+    where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+      and(user_type = 1 or user_type = 3)
+    union all
+    select
+         data_id         --   '自增主键'
+        ,user_id         --   '用户id'
+        ,user_name       --   '用户名'
+        ,student_id      --   '学生id'
+        ,student_name    --   '学生名'
+        ,org_id          --   '机构id'
+        ,message_id      --   '消息id'
+        ,status          --   '消息状态（0-删除，1-未读，2-已读）'
+        ,user_type       --   '用户类型'
+        ,create_time     --   '创建时间'
+        ,update_time     --   '更新时间'
+        ,org_name        --   '学校名称'
+        ,grade_id        --   '年级'
+        ,grade_name      --   '年级名称'
+        ,class_id        --   '班级'
+        ,class_name      --   '班级名称'
+        ,data_flag
+        ,message_type
+    from dwh_dw_campus.clife_campus_dwd_push_message_info
+    where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+      and user_type = 2
+  )t 
+  left join dwh_dw_campus.clife_campus_dim_org t1 on t.org_id = t1.org_id and t1.part_date = regexp_replace(date_sub(current_date(),1),'-','')
+  group by t.class_id
+          ,t.grade_id
+          ,t.org_id
+)tp
+
+

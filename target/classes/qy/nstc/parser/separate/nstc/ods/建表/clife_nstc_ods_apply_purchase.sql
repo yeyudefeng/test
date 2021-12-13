@@ -1,0 +1,27 @@
+create table if not exists db_ods_nstc.clife_nstc_ods_apply_purchase ( 
+     purchase_id                    int                  comment '采购id' 
+    ,member_id                      string               comment '会员id' 
+    ,purchase_num                   int                  comment '采购数量' 
+    ,purchase_price                 double               comment '价格' 
+    ,purchase_class                 string               comment '采购品种' 
+    ,purchase_level                 string               comment '(弃用)' 
+    ,address                        string               comment '收货地址' 
+    ,fromword                       string               comment '期望货源地' 
+    ,go                             string               comment '收获地' 
+    ,create_at                      string               comment '创建时间' 
+    ,create_by                      string               comment '创建者' 
+    ,update_at                      string               comment '更新时间' 
+    ,conent                         string               comment '内容(选填）' 
+    ,image                          string               comment '图片地址' 
+    ,del_flag                       string               comment '是否删除' 
+    ,title                          string               comment '标题' 
+    ,memeber_level                  int                  comment '会员身份' 
+    ,memeber_avator                 string               comment '头像' 
+    ,member_phone                   string               comment '手机号' 
+    ,statu                          string               comment '0发布中 1已结束 2被驳回' 
+    ,scannum                        int                  comment '浏览次数' 
+) comment '采购信息' 
+partitioned by (  part_date string  ) 
+row format delimited fields terminated by '\t' 
+stored as parquet 
+;

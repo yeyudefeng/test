@@ -1,0 +1,3 @@
+﻿tm_id,tm_dw_name,tm_describe,te_id,te_name,te_filed_type
+1524,db_dw_hr.clife_hr_dws_market_by_product_id_d,华润养老机构签约会籍产品累计汇总日表,2302,part_date,string
+1527,db_dw_hr.clife_hr_dws_market_by_product_id_y,华润养老机构签约会籍产品累计汇总年表,2305,part_date,string

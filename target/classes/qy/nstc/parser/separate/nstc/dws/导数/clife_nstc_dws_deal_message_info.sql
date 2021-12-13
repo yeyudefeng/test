@@ -1,0 +1,32 @@
+insert overwrite table db_dw_nstc.clife_nstc_dws_deal_message_info partition(part_date)
+select 
+     member_id                                                                                     -- '会员id'  
+    ,goods_class                                                                                   -- '种类'
+    ,start_place                                                                                   -- '开始地'
+    ,end_place                                                                                     -- '目的地'
+    ,substr(if(update_at is null, create_at, update_at),0,10)            as release_day   -- '发布时间'
+    ,max(member_name)                                                    as member_name            -- '昵称'
+    ,sum(case when action_type=0 then 1 else 0 end                 )     as purchase_cnt           -- '采购信息数量'
+    ,sum(case when action_type=1 then 1 else 0 end                 )     as suppery_cnt            -- '供应信息数量'
+    ,sum(case when action_type=2 then 1 else 0 end                 )     as rent_cnt               -- '车找苗信息数量'
+    ,sum(case when action_type=3 then 1 else 0 end                 )     as lease_cnt              -- '苗找车信息数量'
+    ,sum(case when action_type=0 and status = '0' then 1 else 0 end)     as purchase_release_cnt   -- '采购信息发布中数量'
+    ,sum(case when action_type=1 and status = '0' then 1 else 0 end)     as suppery_release_cnt    -- '供应信息发布中数量'
+    ,sum(case when action_type=2 and status = '0' then 1 else 0 end)     as rent_release_cnt       -- '车找苗信息发布中数量'
+    ,sum(case when action_type=3 and status = '0' then 1 else 0 end)     as lease_release_cnt      -- '苗找车信息发布中数量'
+    ,sum(case when action_type=0 and status = '1' then 1 else 0 end)     as purchase_finish_cnt    -- '采购信息已结束数量'
+    ,sum(case when action_type=1 and status = '1' then 1 else 0 end)     as suppery_finish_cnt     -- '供应信息已结束数量'
+    ,sum(case when action_type=2 and status = '1' then 1 else 0 end)     as rent_finish_cnt        -- '车找苗信息已结束数量'
+    ,sum(case when action_type=3 and status = '1' then 1 else 0 end)     as lease_finish_cnt       -- '苗找车信息已结束数量'
+    ,sum(case when action_type=0 and status = '2' then 1 else 0 end)     as purchase_return_cnt    -- '采购信息被驳回数量'
+    ,sum(case when action_type=1 and status = '2' then 1 else 0 end)     as suppery_return_cnt     -- '供应信息被驳回数量'
+    ,sum(case when action_type=2 and status = '2' then 1 else 0 end)     as rent_return_cnt        -- '车找苗信息被驳回数量'
+    ,sum(case when action_type=3 and status = '2' then 1 else 0 end)     as lease_return_cnt       -- '苗找车信息被驳回数量'
+    ,sum(case when action_type=0 then scannum else 0 end)                as purchase_scan_num      -- '采购信息浏览量'
+    ,sum(case when action_type=1 then scannum else 0 end)                as suppery_scan_num       -- '供应信息浏览量'
+    ,sum(case when action_type=2 then scannum else 0 end)                as rent_scan_num          -- '车找苗信息浏览量'
+    ,sum(case when action_type=3 then scannum else 0 end)                as lease_scan_num         -- '苗找车信息浏览量'
+    ,max(part_date)                                                      as part_date              -- '分区日期'
+from db_dw_nstc.clife_nstc_dwd_deal_message_info
+where part_date = regexp_replace(date_sub(current_date(),1),'-','') 
+group by member_id, goods_class, start_place, end_place, substr(if(update_at is null, create_at, update_at),0,10)

@@ -1,0 +1,827 @@
+==================
+db_pension_organization.tb_advisory_customer
+==================
+CREATE TABLE `tb_advisory_customer` (
+  `advisory_customer_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '咨询客户主键id',
+  `customer_name` varchar(255) NOT NULL COMMENT '咨询客户姓名',
+  `phone_number` varchar(255) DEFAULT NULL COMMENT '联系电话',
+  `intentional_type` tinyint(4) DEFAULT NULL COMMENT '意向类型',
+  `sex` tinyint(4) DEFAULT NULL COMMENT '性别(0:男,1女)',
+  `reception_date` datetime DEFAULT NULL COMMENT '接待日期',
+  `sales_consultant_id` bigint(20) DEFAULT NULL COMMENT '销售顾问Id',
+  `sales_consultant_name` varchar(255) DEFAULT NULL COMMENT '销售顾问姓名',
+  `visit_count` tinyint(4) unsigned DEFAULT '0' COMMENT '回访次数',
+  `linked_customer_num` tinyint(4) DEFAULT '0' COMMENT '关联意向客户的数量',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `create_user_id` int(20) DEFAULT NULL COMMENT '创建人Id',
+  `org_id` tinyint(4) DEFAULT NULL COMMENT '机构Id',
+  `sub_org_id` tinyint(4) DEFAULT NULL COMMENT '集团Id',
+  `status` tinyint(4) DEFAULT '1' COMMENT '删除标记 0 删除  1 正常',
+  PRIMARY KEY (`advisory_customer_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='咨询客户表'
+
+
+==================
+db_pension_organization.tb_intention_customer
+==================
+CREATE TABLE `tb_intention_customer` (
+  `intention_customer_id` bigint(20) NOT NULL COMMENT '意向客户主键Id',
+  `old_man_id` bigint(20) NOT NULL COMMENT '老人Id',
+  `customer_name` varchar(255) NOT NULL COMMENT '客户姓名',
+  `sex` tinyint(4) NOT NULL COMMENT '性别(0:男,1女)',
+  `phone_num` varchar(255) DEFAULT NULL COMMENT '电话号码',
+  `credent_type` tinyint(4) NOT NULL COMMENT '证件类型',
+  `id_card_num` varchar(255) NOT NULL COMMENT '证件号',
+  `birthday` datetime DEFAULT NULL COMMENT '生日',
+  `reception_date` datetime DEFAULT NULL COMMENT '接待日期',
+  `intentional_type` tinyint(4) DEFAULT NULL COMMENT '意向类型',
+  `sales_consultant_id` bigint(20) DEFAULT NULL COMMENT '销售顾问id',
+  `sales_consultant_name` varchar(255) DEFAULT NULL COMMENT '销售顾问姓名',
+  `linked_advisory_customer_id` bigint(20) DEFAULT NULL COMMENT '关联的咨询客户Id',
+  `visit_count` tinyint(4) DEFAULT '0' COMMENT '回访次数',
+  `guardian_name` varchar(255) DEFAULT NULL COMMENT '监护人姓名',
+  `guardian_sex` tinyint(4) DEFAULT NULL COMMENT '监护人性别 0 其他 1 男 2 女',
+  `relationship` tinyint(4) DEFAULT NULL COMMENT '监护人与意向客户的关系 0-其他 1-父子 2-父女 3-母子 4-母女 5-爷孙',
+  `guardian_phone_num` varchar(255) DEFAULT NULL COMMENT '监护人联系方式',
+  `guardian_credent_type` tinyint(4) DEFAULT NULL COMMENT '监护人证件类型',
+  `guardian_id_card_num` varchar(255) DEFAULT NULL COMMENT '监护人证件号',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `care_level` tinyint(4) DEFAULT NULL COMMENT '护理等级(评估结果)',
+  `assess_status` tinyint(4) DEFAULT '0' COMMENT '评估状态 0 待评估 1 发起评估 2 已确认(评估中) 3 完成评估 4 发起入住通知',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `create_user_id` int(20) DEFAULT NULL COMMENT '创建人id',
+  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `status` tinyint(4) DEFAULT '1' COMMENT '删除标记 0 删除  1 正常',
+  PRIMARY KEY (`intention_customer_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='意向客户表'
+
+
+==================
+db_pension_organization.tb_customer_visit_record
+==================
+CREATE TABLE `tb_customer_visit_record` (
+  `visit_id` bigint(20) NOT NULL COMMENT '主键id',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `create_user_name` varchar(255) DEFAULT NULL COMMENT '创建人姓名',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(11) unsigned NOT NULL COMMENT '机构id',
+  `customer_id` bigint(20) unsigned NOT NULL COMMENT '客户id',
+  `intentional_type` tinyint(1) unsigned DEFAULT NULL COMMENT '意向类型 0 不感兴趣 1一般、2感兴趣、3希望购买',
+  `return_visit_remind_time` datetime DEFAULT NULL COMMENT '回访提醒时间',
+  `visit_date` datetime NOT NULL COMMENT '回访日期',
+  `visit_type` tinyint(11) unsigned DEFAULT NULL COMMENT '访问方式 1 电话 2 来访 3 微信 4 qq 5 其他',
+  `content` varchar(200) DEFAULT NULL COMMENT '沟通内容',
+  `remark` varchar(200) DEFAULT NULL COMMENT '备注',
+  `status` tinyint(4) DEFAULT '1' COMMENT '删除标记 0 删除 1 正常',
+  PRIMARY KEY (`visit_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='客户回访表'
+
+
+==================
+db_csleep_account.tb_admin_sub_org
+==================
+CREATE TABLE `tb_admin_sub_org` (
+  `sub_org_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '机构id',
+  `org_info_id` int(10) unsigned NOT NULL COMMENT '机构基础信息',
+  `org_type` int(10) unsigned DEFAULT NULL COMMENT '机构类型',
+  `parent_org_id` int(10) unsigned DEFAULT NULL COMMENT '父id',
+  `org_id` int(10) unsigned NOT NULL COMMENT '集团id',
+  `org_name` varchar(50) NOT NULL COMMENT '机构名称',
+  `org_account` varchar(50) NOT NULL COMMENT '管理账号',
+  `org_account_id` int(10) unsigned NOT NULL COMMENT '管理账号id',
+  `org_password` varchar(200) NOT NULL COMMENT '管理密码',
+  `valid_time` date DEFAULT NULL COMMENT '有效时间',
+  `lose_time` date DEFAULT NULL COMMENT '失效时间',
+  `org_desc` text COMMENT '介绍',
+  `org_picture` text COMMENT '宣传图片多个“；”隔开',
+  `status` int(10) unsigned DEFAULT NULL COMMENT '1：有效；0：无效',
+  `app_id` int(10) unsigned DEFAULT NULL,
+  `org_code` varchar(50) DEFAULT NULL COMMENT '机构代号（网址后缀）',
+  `org_group_id` int(10) unsigned DEFAULT NULL,
+  `handle_user` int(11) unsigned DEFAULT NULL COMMENT '操作人',
+  `type` int(11) unsigned DEFAULT NULL COMMENT '1:冻结；0:正常',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `ubdertake_type` int(10) unsigned DEFAULT NULL COMMENT '承办类型 1：公办公营 2:公办民营 3:民办民营 4：其它',
+  `operation_model` int(10) unsigned DEFAULT NULL COMMENT '运营模式 1：公办 2：民办非企业性质 3:工商注册 4：其它',
+  `org_lv` int(10) unsigned DEFAULT NULL COMMENT '机构评级',
+  `area` varchar(50) DEFAULT NULL COMMENT '区',
+  `province` varchar(50) DEFAULT NULL COMMENT '省',
+  `city` varchar(50) DEFAULT NULL COMMENT '市',
+  `town` varchar(50) DEFAULT NULL COMMENT '镇',
+  `village` varchar(50) DEFAULT NULL COMMENT '社区ID',
+  `principal` varchar(50) DEFAULT NULL COMMENT '负责人',
+  `link_phone` varchar(50) DEFAULT NULL COMMENT '联系电话',
+  `address` varchar(200) DEFAULT NULL COMMENT '地址',
+  `sub_org_type` tinyint(4) DEFAULT '0' COMMENT '子机构类型，0-养老院，1-关联服务中心',
+  `area_id` varchar(20) DEFAULT NULL COMMENT '省市区区域ID',
+  `service_province` varchar(50) DEFAULT NULL COMMENT '经营范围省',
+  `service_city` varchar(50) DEFAULT NULL COMMENT '经营范围市',
+  `service_area` varchar(50) DEFAULT NULL COMMENT '经营范围区',
+  `latitude` varchar(20) DEFAULT NULL COMMENT '纬度',
+  `longitude` varchar(20) DEFAULT NULL COMMENT '经度',
+  PRIMARY KEY (`sub_org_id`) USING BTREE,
+  KEY `org_id` (`org_account`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=206 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='养老机构'
+
+
+==================
+db_csleep_account.tb_admin_org
+==================
+CREATE TABLE `tb_admin_org` (
+  `org_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '机构id',
+  `org_info_id` int(10) unsigned NOT NULL COMMENT '机构基础信息',
+  `org_type` int(10) unsigned NOT NULL COMMENT '机构类型',
+  `org_name` varchar(50) NOT NULL COMMENT '机构名称',
+  `org_account` varchar(50) NOT NULL COMMENT '管理账号',
+  `org_account_id` int(10) unsigned NOT NULL COMMENT '管理账号id',
+  `org_password` varchar(200) NOT NULL COMMENT '管理密码',
+  `valid_time` date NOT NULL COMMENT '有效时间',
+  `lose_time` date NOT NULL COMMENT '失效时间',
+  `org_desc` text COMMENT '介绍',
+  `org_picture` text COMMENT '宣传图片多个“；”隔开',
+  `status` int(10) unsigned NOT NULL COMMENT '1：有效；0：无效',
+  `app_id` int(10) unsigned NOT NULL,
+  `org_code` varchar(50) DEFAULT NULL COMMENT '机构代号（网址后缀）',
+  `org_group_id` int(10) unsigned DEFAULT NULL,
+  `handle_user` int(10) unsigned DEFAULT NULL COMMENT '操作人',
+  `type` int(10) unsigned NOT NULL COMMENT '1:冻结；0：正常',
+  `update_time` datetime NOT NULL COMMENT '更新时间',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `principal` varchar(50) DEFAULT NULL COMMENT '负责人',
+  `link_phone` varchar(50) DEFAULT NULL COMMENT '联系电话',
+  `area` varchar(50) DEFAULT NULL COMMENT '区域',
+  `province` varchar(50) DEFAULT NULL COMMENT '省',
+  `city` varchar(50) DEFAULT NULL COMMENT '市',
+  `town` varchar(50) DEFAULT NULL COMMENT '镇',
+  `address` varchar(200) DEFAULT NULL COMMENT '地址',
+  `latitude` varchar(20) DEFAULT NULL COMMENT '纬度',
+  `longitude` varchar(20) DEFAULT NULL COMMENT '经度',
+  PRIMARY KEY (`org_id`) USING BTREE,
+  KEY `org_name` (`org_name`) USING BTREE,
+  KEY `org_id` (`org_code`,`org_account`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='养老集团'
+
+
+==================
+db_nursing_crm.tb_intentional_customer
+==================
+CREATE TABLE `tb_intentional_customer` (
+  `customer_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '意向客户id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `group_id` bigint(20) DEFAULT NULL COMMENT '组id',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(11) unsigned NOT NULL COMMENT '机构id',
+  `name` varchar(20) DEFAULT NULL COMMENT '姓名',
+  `sex_option` int(11) unsigned DEFAULT NULL COMMENT '性别选项id',
+  `birthday` datetime DEFAULT NULL COMMENT '生日',
+  `phone` varchar(20) DEFAULT NULL COMMENT '联系电话',
+  `age_option` int(11) unsigned DEFAULT NULL COMMENT '年龄选项id',
+  `credent_type` int(11) unsigned DEFAULT NULL COMMENT '证件类型',
+  `id_card_no` varchar(20) DEFAULT NULL COMMENT '证件号',
+  `province` bigint(20) DEFAULT NULL COMMENT '省',
+  `city` bigint(20) DEFAULT NULL COMMENT '市',
+  `area` bigint(20) DEFAULT NULL COMMENT '区',
+  `town` bigint(20) DEFAULT NULL COMMENT '镇',
+  `address` varchar(200) DEFAULT NULL COMMENT '地址',
+  `trade_channel_types` varchar(500) DEFAULT NULL COMMENT '渠道类型',
+  `trade_channel_ids` varchar(500) DEFAULT NULL COMMENT '渠道id',
+  `intentional_type` int(1) unsigned DEFAULT NULL COMMENT '意向类型 1感兴趣、2不感兴趣、3一般、4希望购买',
+  `membership_adviser_id` int(11) DEFAULT NULL COMMENT '会籍顾问id',
+  `visit_count` tinyint(4) DEFAULT '0' COMMENT '回访次数',
+  `return_visit_remind_time` datetime DEFAULT NULL COMMENT '回访提醒时间',
+  `communication_content` varchar(200) DEFAULT NULL COMMENT '沟通内容',
+  `remark` varchar(200) DEFAULT NULL COMMENT '备注',
+  `visit_type` int(11) unsigned DEFAULT NULL COMMENT '来访方式选项id',
+  `filling_time` datetime DEFAULT NULL COMMENT '填表时间',
+  `questionnaire_id` bigint(20) DEFAULT NULL COMMENT '问卷答案id',
+  `del_flag` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  `membership_id` int(11) unsigned DEFAULT NULL COMMENT '意向会籍id',
+  `membership_name` varchar(20) DEFAULT NULL COMMENT '意向会籍名称',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0意向中 1申请中 2签约中 3已签约 | 4已作废',
+  `phone_visit` int(11) DEFAULT NULL COMMENT '是否来电转来访 1:是 2：否',
+  `receive_status` int(11) DEFAULT NULL COMMENT '是否有效接待',
+  `apartment_type` int(11) DEFAULT NULL COMMENT '关注公寓类型',
+  `room_type` int(11) DEFAULT NULL COMMENT '关注房型',
+  `vitality_intention` int(11) DEFAULT NULL COMMENT '活力公寓租赁倾向',
+  `customer_lv` int(11) DEFAULT NULL COMMENT '客户等级',
+  `consult_time` int(11) DEFAULT NULL COMMENT '第几次咨询',
+  `possible_customer` int(11) DEFAULT NULL COMMENT '解决服务费抗性后极有可能签约的客户',
+  `cost_type` int(11) DEFAULT NULL COMMENT '期望服务费方案',
+  `age` int(10) unsigned DEFAULT NULL COMMENT '年龄',
+  `retire_worker` varchar(50) DEFAULT NULL COMMENT '退休前工作',
+  `hobbies` varchar(50) DEFAULT NULL COMMENT '爱好',
+  `about_org` varchar(50) DEFAULT NULL COMMENT '提及机构',
+  `resistance` varchar(50) DEFAULT NULL COMMENT '项目抗性',
+  PRIMARY KEY (`customer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='意向客户'
+
+
+==================
+db_csleep_account.tb_worker_new
+==================
+CREATE TABLE `tb_worker_new` (
+  `worker_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '工作人员id',
+  `worker_name` varchar(50) NOT NULL COMMENT '姓名',
+  `nurse_worker_id` int(11) DEFAULT NULL COMMENT '养老工作人员id',
+  `worker_role_id` int(11) DEFAULT NULL COMMENT '职位Id（0为其他1为护士2为护工3为医生7为康复师8为药师9为社工10为行政人员）',
+  `credent_type` int(11) unsigned DEFAULT NULL COMMENT '证件类型 1:身份证',
+  `credent_number` varchar(50) DEFAULT NULL COMMENT '证件号',
+  `sex` int(10) unsigned DEFAULT NULL COMMENT '性别',
+  `birthday` date DEFAULT NULL COMMENT '生日',
+  `natives_province` varchar(50) DEFAULT NULL COMMENT '籍贯省',
+  `natives_city` varchar(50) DEFAULT NULL COMMENT '籍贯市',
+  `native_address` varchar(200) DEFAULT NULL COMMENT '籍贯地址',
+  `worker_type` int(11) DEFAULT NULL COMMENT '1：内部工作人员 2：集团工作人员 3：机构工作人员',
+  `portrait_url` varchar(255) DEFAULT NULL COMMENT '头像url',
+  `phone` varchar(50) DEFAULT NULL COMMENT '电话号码',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构Id',
+  `user_id` int(10) unsigned DEFAULT NULL COMMENT '关联帐号id',
+  `worker_status` int(10) unsigned DEFAULT NULL COMMENT '状态 1:在职 2：离职',
+  `nurse_home_id` int(10) unsigned DEFAULT NULL COMMENT '关联的养老院id',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `job_title` varchar(20) DEFAULT NULL COMMENT '职位名称',
+  `center_id` bigint(20) DEFAULT NULL COMMENT '中心ID(服务中心)',
+  `has_supplier` int(2) DEFAULT '0' COMMENT '是否有所属供应商(0没有,1有)',
+  `personnel_type` tinyint(1) DEFAULT NULL COMMENT '人员类型 1 服务人员 2 后勤人员 3 管理人员 4 财务人员 5 行政人员 6 营销人员 7 其他',
+  `occupation_type` tinyint(1) DEFAULT NULL COMMENT '职业			1 医生 2 护士 3 照护师 4 管家 5 其他',
+  `position` varchar(50) DEFAULT NULL COMMENT '岗位',
+  `department_name` varchar(255) DEFAULT NULL COMMENT '部门名称',
+  `department_id` int(11) DEFAULT NULL COMMENT '部门id',
+  `live_address` varchar(255) DEFAULT NULL COMMENT '居住地址',
+  PRIMARY KEY (`worker_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=410 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='工作人员（包含养老院的工作人员）'
+
+
+==================
+db_nursing_crm.tb_intentional_customer_channel
+==================
+CREATE TABLE `tb_intentional_customer_channel` (
+  `customer_id` bigint(20) unsigned NOT NULL COMMENT '意向客户id',
+  `channel_id` bigint(20) unsigned NOT NULL COMMENT '渠道id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`customer_id`,`channel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='意向客户来源渠道表'
+
+
+==================
+db_nursing_crm.tb_intentional_customer_visit
+==================
+CREATE TABLE `tb_intentional_customer_visit` (
+  `visit_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `create_user_name` varchar(20) DEFAULT NULL COMMENT '创建人姓名',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(11) unsigned NOT NULL COMMENT '机构id',
+  `customer_id` bigint(20) unsigned NOT NULL COMMENT '意向客户id',
+  `membership_id` int(11) unsigned DEFAULT NULL COMMENT '预申请会籍id',
+  `membership_name` varchar(20) DEFAULT NULL COMMENT '预申请会籍名称',
+  `intentional_type` int(1) unsigned DEFAULT NULL COMMENT '意向类型 1感兴趣、2不感兴趣、3一般、4希望购买',
+  `return_visit_remind_time` datetime DEFAULT NULL COMMENT '回访提醒时间',
+  `visit_date` datetime NOT NULL COMMENT '访问日期',
+  `visit_type` int(11) unsigned DEFAULT NULL COMMENT '访问方式id',
+  `content` varchar(200) DEFAULT NULL COMMENT '访问内容',
+  `remark` varchar(200) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`visit_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=459659512295637232 DEFAULT CHARSET=utf8mb4 COMMENT='客户回访表'
+
+
+==================
+db_nursing_crm.tb_contract_deposit
+==================
+CREATE TABLE `tb_contract_deposit` (
+  `deposit_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `deposit_num` varchar(255) DEFAULT NULL COMMENT '定金编号',
+  `intent_user_id` bigint(20) DEFAULT NULL COMMENT '意向客户id',
+  `payee_name` varchar(255) DEFAULT NULL COMMENT '交款人名字',
+  `payee_phone` varchar(255) DEFAULT NULL COMMENT '交款人联系方式',
+  `membership_id` int(11) DEFAULT NULL COMMENT '会籍id',
+  `membership_name` varchar(20) DEFAULT NULL COMMENT '意向会籍名称',
+  `deposit_amount` decimal(10,3) DEFAULT '0.000' COMMENT '定金金额',
+  `membership_adviser_id` int(11) DEFAULT NULL COMMENT '会籍顾问id（舍弃，不再使用）',
+  `house_type_id` int(11) DEFAULT NULL COMMENT '房型',
+  `pay_amount` decimal(10,3) DEFAULT '0.000' COMMENT '缴费金额',
+  `refund_amount` decimal(10,3) DEFAULT '0.000' COMMENT '退费金额',
+  `deposit_status` int(11) DEFAULT NULL COMMENT '1-正常 2-退订',
+  `user_id` int(11) unsigned DEFAULT NULL COMMENT '账号id',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `remark` varchar(510) DEFAULT NULL COMMENT '备注',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `building_id` bigint(20) DEFAULT NULL COMMENT '楼栋id',
+  `floor_id` bigint(20) DEFAULT NULL COMMENT '楼层id',
+  `room_id` bigint(20) DEFAULT NULL COMMENT '房间id',
+  `bed_id` bigint(20) DEFAULT NULL COMMENT '床位id',
+  `apply_id` bigint(20) NOT NULL COMMENT '关联tb_membership_apply 会籍申请表主键applyId',
+  `receipt_number` varchar(100) DEFAULT NULL COMMENT '收费回执编号(华润1.5.0)',
+  PRIMARY KEY (`deposit_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=458 DEFAULT CHARSET=utf8mb4 COMMENT='合同定金表'
+
+
+==================
+db_nursing_crm.tb_contract_sign
+==================
+CREATE TABLE `tb_contract_sign` (
+  `sign_id` bigint(20) unsigned NOT NULL COMMENT 'id',
+  `intent_user_id` bigint(20) DEFAULT NULL COMMENT '意向客户id',
+  `contract_num` varchar(255) DEFAULT NULL COMMENT '合同编号',
+  `contract_status` tinyint(2) DEFAULT NULL COMMENT '合同状态 1-正常 2-终止  3-被继承或转让',
+  `membership_type` int(11) DEFAULT NULL COMMENT '会籍类型',
+  `membership_name` varchar(255) DEFAULT NULL COMMENT '会籍名称',
+  `membership_num` varchar(255) DEFAULT NULL COMMENT '会籍编号',
+  `membership_amount` decimal(10,2) DEFAULT '0.00' COMMENT '会籍费',
+  `chip_num` varchar(255) DEFAULT NULL COMMENT '芯片编号',
+  `building_id` bigint(11) DEFAULT NULL COMMENT '楼栋id',
+  `floor_id` bigint(11) DEFAULT NULL COMMENT '楼层id',
+  `room_id` bigint(11) DEFAULT NULL COMMENT '房间id',
+  `bed_id` bigint(11) DEFAULT NULL COMMENT '床位id',
+  `sign_house` tinyint(1) DEFAULT NULL COMMENT '签约选房(1-选房  2-不选房)',
+  `originator_type` tinyint(4) DEFAULT NULL COMMENT '权益人类型（0个人）',
+  `reason` tinyint(4) DEFAULT NULL COMMENT '购买原因（0投资，1自用）',
+  `is_pay_deposit` tinyint(4) DEFAULT NULL COMMENT '是否缴定金（0是，1否）',
+  `deposit_amount` decimal(10,2) DEFAULT '0.00' COMMENT '定金金额',
+  `deposit_num` varchar(20) DEFAULT NULL COMMENT '定金编号',
+  `received_fee` decimal(10,2) DEFAULT '0.00' COMMENT '已收费用',
+  `pay_state` tinyint(2) DEFAULT '0' COMMENT '是否缴清 （0-未缴费 1-已缴费未缴清 2-缴清）',
+  `sign_date` date DEFAULT NULL COMMENT '卡销售成功时间（付清款项时间）',
+  `card_valid` int(10) DEFAULT NULL COMMENT '卡有效期（年）',
+  `house_type` int(11) DEFAULT NULL COMMENT '房型（取常量id）',
+  `other_amount` decimal(10,2) DEFAULT '0.00' COMMENT '其他费用',
+  `other_amount_explain` varchar(510) DEFAULT NULL COMMENT '其他费用说明',
+  `is_divided` tinyint(1) DEFAULT NULL COMMENT '是否分期（0-否 1-是）',
+  `membership_effective_time` datetime DEFAULT NULL COMMENT '会籍生效时间',
+  `membership_id` bigint(20) DEFAULT NULL COMMENT '会籍id',
+  `product_id` bigint(20) DEFAULT NULL COMMENT '产品id',
+  `user_id` int(11) DEFAULT NULL COMMENT '账号id',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `cancle_time` datetime DEFAULT NULL COMMENT '合同撤销时间',
+  `manager_fee` decimal(10,2) DEFAULT '0.00' COMMENT '管理费（元）',
+  `living_limit` int(11) DEFAULT NULL COMMENT '居住期限（月）',
+  `discount` int(11) DEFAULT NULL COMMENT '折扣',
+  `total_deduction` int(11) DEFAULT NULL COMMENT '可抵扣服务数',
+  `daily_deduction_limit` int(11) DEFAULT NULL COMMENT '每天抵扣限制',
+  `description` varchar(500) DEFAULT NULL COMMENT '说明',
+  `card_type` tinyint(1) unsigned DEFAULT NULL COMMENT '会籍卡类型 0权益卡 1折扣卡 2服务卡',
+  `is_agency` tinyint(1) unsigned DEFAULT '0' COMMENT '是否代理签订（0-否 1-是） ',
+  `agency_id` bigint(20) DEFAULT NULL COMMENT '代理人id',
+  `payment_type_id` bigint(20) DEFAULT NULL COMMENT '支付方式id',
+  `payment_type_name` varchar(20) DEFAULT NULL COMMENT '支付方式名字',
+  `service_fee_id` bigint(20) DEFAULT NULL COMMENT '基础服务费id',
+  `del_flag` tinyint(1) unsigned DEFAULT '0' COMMENT '删除标记（0-否 1-是）',
+  `service_fee_amount` decimal(12,4) DEFAULT '0.0000' COMMENT '基础服务费金额',
+  `service_fee_name` varchar(20) DEFAULT NULL COMMENT '基础服务费名字',
+  `is_trust` tinyint(1) unsigned DEFAULT '0' COMMENT '是否托管（0-否 1-是） ',
+  `trust_limit` int(11) DEFAULT NULL COMMENT '托管时间（年）',
+  `trust_fee` decimal(12,4) DEFAULT NULL COMMENT '托管收益(月/元)',
+  `trust_id` bigint(20) unsigned DEFAULT NULL COMMENT '托管id',
+  `membership_discount` decimal(12,4) DEFAULT '0.0000' COMMENT '会籍优惠价',
+  `apply_id` bigint(20) NOT NULL COMMENT '关联tb_membership_apply 会籍申请表主键applyId',
+  `show_status` tinyint(1) DEFAULT '0' COMMENT '0-展示 1-不展示 ',
+  `free_visit_day` int(4) DEFAULT '45' COMMENT '免费探访天数',
+  `card_valid_month` decimal(10,2) DEFAULT NULL COMMENT '卡有效期（单位：月 保利2.0.3需求更改卡有效期单位为月）',
+  PRIMARY KEY (`sign_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='合同签约表'
+
+
+==================
+db_nursing_crm.tb_membership_transfer
+==================
+CREATE TABLE `tb_membership_transfer` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `membership_id` bigint(20) NOT NULL COMMENT '会籍id',
+  `contract_id` bigint(20) DEFAULT NULL COMMENT '合同id',
+  `pre_transfer_owners` varchar(200) DEFAULT NULL COMMENT '原会籍的权益人，用“,”分割',
+  `pre_contract_id` bigint(20) DEFAULT NULL COMMENT '原合同id',
+  `transfer_date` date NOT NULL COMMENT '转让/继承日期',
+  `state` tinyint(2) unsigned DEFAULT NULL COMMENT '会籍转让/继承状态 1-未确认 2-确认转让 3-审批中',
+  `other_amount` decimal(10,2) DEFAULT '0.00' COMMENT '其他费用',
+  `other_amount_explain` varchar(510) DEFAULT NULL COMMENT '其他费用说明',
+  `transfer_fee` decimal(10,2) DEFAULT '0.00' COMMENT '转让/继承费',
+  `transfer_fee_status` tinyint(2) DEFAULT NULL COMMENT '转让/继承费状态 1-未收 2-已收',
+  `audit_user_id` int(11) unsigned DEFAULT NULL COMMENT '审批人id',
+  `type` tinyint(1) unsigned DEFAULT NULL COMMENT '类型（1-会籍转让 2-会籍继承）',
+  `del_flag` tinyint(1) unsigned DEFAULT '0' COMMENT '删除标记（0-否 1-是）',
+  `remark` varchar(600) DEFAULT NULL COMMENT '备注',
+  `user_id` int(11) DEFAULT NULL COMMENT '创建账号id',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `transfer_nature` tinyint(1) DEFAULT NULL COMMENT '转让性质(1-赠与，2-转让)',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会籍转让表'
+
+
+==================
+db_nursing_crm.tb_membership_withdraw
+==================
+CREATE TABLE `tb_membership_withdraw` (
+  `id` bigint(20) unsigned NOT NULL COMMENT '主键id',
+  `contract_id` bigint(20) unsigned NOT NULL COMMENT '合同id',
+  `remain_day` int(11) DEFAULT NULL COMMENT '剩余天数',
+  `apply_date` date DEFAULT NULL COMMENT '申请日期',
+  `apply_person` varchar(20) DEFAULT NULL COMMENT '申请人',
+  `audit_user_id` int(11) unsigned DEFAULT NULL COMMENT '审批人id',
+  `handler_person` varchar(20) DEFAULT NULL COMMENT '经手人',
+  `withdraw_reason` varchar(100) DEFAULT NULL COMMENT '退会籍原因',
+  `cancle_fee_status` tinyint(2) DEFAULT '1' COMMENT '是否退会费 1-否 2-是',
+  `del_flag` tinyint(1) unsigned DEFAULT '0' COMMENT '删除标记（0-否 1-是）',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `premium_type` int(4) DEFAULT NULL COMMENT '退费类型 1：回购 2：身故退费 3:退会籍',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退会籍表'
+
+
+==================
+db_nursing_crm.tb_membership_owner
+==================
+CREATE TABLE `tb_membership_owner` (
+  `id` bigint(20) unsigned NOT NULL COMMENT '权益人ID',
+  `contract_id` bigint(20) unsigned NOT NULL COMMENT '合同id',
+  `name` varchar(10) NOT NULL COMMENT '姓名',
+  `sex` tinyint(2) unsigned DEFAULT '1' COMMENT '1-男 2-女',
+  `birthday` date DEFAULT NULL COMMENT '出生日期',
+  `phone` varchar(20) NOT NULL COMMENT '联系电话',
+  `id_card` varchar(18) NOT NULL COMMENT '证件号码',
+  `card_type` int(11) unsigned NOT NULL COMMENT '证件类型 1-身份证',
+  `age` int(10) DEFAULT NULL COMMENT '年龄',
+  `census_register` varchar(200) DEFAULT NULL COMMENT '户籍地址',
+  `census_province_id` bigint(11) unsigned DEFAULT NULL COMMENT '户籍省id',
+  `census_province_name` varchar(20) DEFAULT NULL COMMENT '户籍省名称',
+  `census_city_id` bigint(11) unsigned DEFAULT NULL COMMENT '户籍市id',
+  `census_city_name` varchar(20) DEFAULT NULL COMMENT '户籍市名称',
+  `census_area_id` bigint(11) unsigned DEFAULT NULL COMMENT '户籍区id',
+  `census_area_name` varchar(20) DEFAULT NULL COMMENT '户籍区名称',
+  `residence` varchar(200) DEFAULT NULL COMMENT '居住地',
+  `residence_province_id` bigint(11) DEFAULT NULL COMMENT '居住地省id',
+  `residence_province_name` varchar(20) DEFAULT NULL COMMENT '居住地省名称',
+  `residence_city_id` bigint(11) DEFAULT NULL COMMENT '居住地市id',
+  `residence_city_name` varchar(20) DEFAULT NULL COMMENT '居住地市名称',
+  `residence_area_id` bigint(11) DEFAULT NULL COMMENT '居住地区id',
+  `residence_area_name` varchar(20) DEFAULT NULL COMMENT '居住地区名称',
+  `unit` varchar(20) DEFAULT NULL COMMENT '所在单位',
+  `title` varchar(10) DEFAULT NULL COMMENT '职务',
+  `hobbies` varchar(20) DEFAULT NULL COMMENT '兴趣特长',
+  `physical_condition` varchar(20) DEFAULT NULL COMMENT '身体状况',
+  `disease_history` varchar(20) DEFAULT NULL COMMENT '有无重大病史、传染病或家族遗传病史',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `type` tinyint(2) unsigned NOT NULL COMMENT '1-主权益人 2-非主权益人',
+  `user_id` int(11) DEFAULT NULL COMMENT '账号id',
+  `org_id` int(11) DEFAULT NULL COMMENT '集团id',
+  `sub_org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `status` tinyint(1) DEFAULT '0' COMMENT '0-正常 1-删除 2已经转让',
+  `audit_user_id` int(11) unsigned DEFAULT NULL COMMENT '审批人',
+  `intent_user_id` bigint(20) DEFAULT NULL COMMENT '意向客户ID(华润，也可作为主权益人ID)',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权益人信息'
+
+
+==================
+db_nursing_crm.tb_card_product
+==================
+CREATE TABLE `tb_card_product` (
+  `product_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '产品id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(11) unsigned NOT NULL COMMENT '机构id',
+  `card_id` int(11) NOT NULL COMMENT '卡id',
+  `batch` int(11) unsigned DEFAULT NULL COMMENT '批次',
+  `card_fee` decimal(10,2) NOT NULL COMMENT '卡费（元）',
+  `manager_fee` decimal(10,2) DEFAULT '0.00' COMMENT '管理费（元）',
+  `living_limit` int(11) NOT NULL COMMENT '居住期限（月）',
+  `card_valid` int(11) NOT NULL COMMENT '卡有效期（年）',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态 0停售 1启用',
+  `del_flag` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  `room_type_option` int(11) unsigned DEFAULT NULL COMMENT '户型选项id',
+  `discount` int(11) DEFAULT NULL COMMENT '折扣',
+  `total_deduction` int(11) DEFAULT NULL COMMENT '可抵扣服务数',
+  `daily_deduction_limit` int(11) DEFAULT NULL COMMENT '每天抵扣限制',
+  `description` varchar(500) DEFAULT NULL COMMENT '说明',
+  `product_num` varchar(255) DEFAULT NULL COMMENT '产品编号',
+  `card_valid_month` decimal(10,2) DEFAULT NULL COMMENT '卡有效期（单位：月 保利2.0.3需求更改卡有效期单位为月）',
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=utf8mb4 COMMENT='会籍卡产品表'
+
+
+==================
+db_nursing_home.tb_location_room
+==================
+CREATE TABLE `tb_location_room` (
+  `room_id` bigint(20) unsigned NOT NULL COMMENT '养老院房间ID',
+  `floor_id` bigint(20) unsigned NOT NULL COMMENT '养老院楼层ID',
+  `room_name` varchar(30) NOT NULL COMMENT '房间名称',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `inside_room_types` varchar(255) DEFAULT NULL COMMENT '房间包含的房型(1 客厅,2 卫生间,3厨房,4阳台)',
+  `nursing_homes_id` int(11) NOT NULL COMMENT '养老院Id',
+  `room_type` int(11) unsigned DEFAULT NULL COMMENT '户型',
+  `house_type_id` bigint(20) DEFAULT NULL COMMENT '机构云户型id',
+  `house_type_name` varchar(32) DEFAULT NULL COMMENT '机构云户型名称',
+  `orientation` int(11) unsigned DEFAULT NULL COMMENT '朝向',
+  `orientation_name` varchar(16) DEFAULT NULL COMMENT '朝向名称',
+  `room_attribute` tinyint(1) DEFAULT '0' COMMENT '房间属性 0护理型 1公寓型',
+  `room_area` double(10,2) unsigned DEFAULT NULL COMMENT '房间面积',
+  `sales_status` tinyint(4) DEFAULT '0' COMMENT '可售状态（0可售 1不可售）',
+  PRIMARY KEY (`room_id`,`floor_id`),
+  KEY `idx_name` (`room_name`) USING BTREE,
+  KEY `room_id` (`room_id`) USING BTREE,
+  KEY `nursing_homes_id` (`nursing_homes_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='养老院楼层-房间'
+
+
+==================
+db_nursing_crm.tb_card
+==================
+CREATE TABLE `tb_card` (
+  `card_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '卡id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `create_user_name` varchar(20) DEFAULT NULL COMMENT '创建人姓名',
+  `card_name` varchar(20) NOT NULL COMMENT '卡名称',
+  `type_option` int(11) unsigned DEFAULT NULL COMMENT '类别选项id',
+  `type` tinyint(1) unsigned DEFAULT NULL COMMENT '会籍卡类型 0权益卡 1折扣卡 2服务卡',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `use_type` tinyint(1) unsigned DEFAULT NULL COMMENT '(该字段废弃)适用机构类型0 全部 1 自定义',
+  `sub_orgs` varchar(200) DEFAULT NULL COMMENT '自定义适用机构集合，逗号隔开',
+  `inherit_status` tinyint(1) unsigned NOT NULL COMMENT '可继承 0否 1是',
+  `inherit_fee` decimal(10,2) DEFAULT '0.00' COMMENT '继承费',
+  `transfer_status` tinyint(1) unsigned NOT NULL COMMENT '可转让 0否 1是',
+  `transfer_fee` decimal(10,2) DEFAULT '0.00' COMMENT '转让费',
+  `return_status` tinyint(1) unsigned NOT NULL COMMENT '可退卡 0否 1是',
+  `return_fee` decimal(10,2) DEFAULT '0.00' COMMENT '退卡费',
+  `borrow_status` tinyint(1) unsigned NOT NULL COMMENT '可借用 0否 1是',
+  `borrow_fee` decimal(10,2) DEFAULT '0.00' COMMENT '借用费',
+  `renewal_status` tinyint(1) unsigned NOT NULL COMMENT '可续签 0否 1是',
+  `renewal_fee` decimal(10,2) DEFAULT '0.00' COMMENT '续签费',
+  `check_in_status` tinyint(1) unsigned NOT NULL COMMENT '可入住 0否 1是',
+  `max_check_in` int(11) unsigned DEFAULT NULL COMMENT '可入住人数',
+  `sojourn_status` tinyint(1) unsigned NOT NULL COMMENT '可旅居 0否 1是',
+  `max_sojourn` int(11) unsigned DEFAULT NULL COMMENT '可旅居人数',
+  `room_status` tinyint(1) unsigned NOT NULL COMMENT '房间数 0否 1是',
+  `room_count` int(11) unsigned DEFAULT NULL COMMENT '每次房间数限制',
+  `discount_status` tinyint(1) unsigned NOT NULL COMMENT '消费优惠 0否 1是',
+  `discount_des` varchar(200) DEFAULT NULL COMMENT '消费优惠说明',
+  `health_check_status` tinyint(1) unsigned NOT NULL COMMENT '免费体检 0否 1是',
+  `health_check_des` varchar(200) DEFAULT NULL COMMENT '免费体检说明',
+  `exclusive_status` tinyint(1) unsigned NOT NULL COMMENT '私人专属用品 0否 1是',
+  `exclusive_des` varchar(200) DEFAULT NULL COMMENT '私人专属用品说明',
+  `priority_residence_status` tinyint(1) unsigned NOT NULL COMMENT '优先居住权 0否 1是',
+  `priority_residence_des` varchar(200) DEFAULT NULL COMMENT '优先居住权说明',
+  `travel_status` tinyint(1) unsigned NOT NULL COMMENT '旅游项目 0否 1是',
+  `travel_des` varchar(200) DEFAULT NULL COMMENT '旅游项目说明',
+  `age_limit_status` tinyint(1) unsigned NOT NULL COMMENT '年龄限制 0否 1是',
+  `woman_min_age_limit` int(11) unsigned DEFAULT NULL COMMENT '女性年龄限制下限',
+  `woman_max_age_limit` int(11) unsigned DEFAULT NULL COMMENT '女性年龄限制上限',
+  `man_max_age_limit` int(11) unsigned DEFAULT NULL COMMENT '男性年龄限制上限',
+  `man_min_age_limit` int(11) unsigned DEFAULT NULL COMMENT '男性年龄限制下限',
+  `time_limit_status` tinyint(1) unsigned NOT NULL COMMENT '单次时效限制 0否 1是',
+  `min_time_limit` int(11) unsigned DEFAULT NULL COMMENT '单次时效限制下限（月）',
+  `max_time_limit` int(11) unsigned DEFAULT NULL COMMENT '单次时效限制上限（月）',
+  `min_time_unit` int(1) unsigned DEFAULT NULL COMMENT '单次时效限制单位',
+  `constitution_name` varchar(100) DEFAULT '' COMMENT '章程文件名',
+  `constitution_url` varchar(255) DEFAULT '' COMMENT '章程文件url',
+  `description` varchar(500) DEFAULT NULL COMMENT '补充说明',
+  `del_flag` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  PRIMARY KEY (`card_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=119 DEFAULT CHARSET=utf8mb4 COMMENT='会籍卡表'
+
+
+==================
+db_nursing_home.tb_nursing_homes_baseinfo
+==================
+CREATE TABLE `tb_nursing_homes_baseinfo` (
+  `nursing_homes_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '养老院id',
+  `nursing_homes_name` varchar(30) DEFAULT '' COMMENT '养老院名称 ',
+  `partition_id` bigint(20) unsigned DEFAULT NULL,
+  `province_id` bigint(20) unsigned DEFAULT NULL COMMENT '所在的省id',
+  `city_id` bigint(20) unsigned DEFAULT NULL COMMENT '所在的市id',
+  `area_id` bigint(20) unsigned DEFAULT NULL,
+  `location_detail` varchar(100) DEFAULT '' COMMENT '位置详细信息',
+  `account_id` int(10) unsigned NOT NULL COMMENT '绑定的登陆用户id (对应clife账号id)',
+  `manage_user_id` int(11) unsigned NOT NULL COMMENT 'cms管理账号userId',
+  `status` tinyint(255) unsigned NOT NULL DEFAULT '1' COMMENT '状态:1:有效 0无效',
+  PRIMARY KEY (`nursing_homes_id`),
+  KEY `index_nursing_userId` (`manage_user_id`,`account_id`) USING BTREE,
+  KEY `idx_account` (`account_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8 COMMENT='养老院基础信息'
+
+
+==================
+db_nursing_home.tb_org_nurse
+==================
+CREATE TABLE `tb_org_nurse` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(10) unsigned NOT NULL COMMENT '机构Id',
+  `orgName` varchar(255) DEFAULT NULL COMMENT '集团名称',
+  `subOrgName` varchar(255) DEFAULT NULL COMMENT '子机构名称',
+  `nurse_home_id` int(11) unsigned NOT NULL COMMENT '养老院id',
+  `nurse_admin_id` int(11) unsigned NOT NULL COMMENT '管理员帐号id',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `nurse_home_id` (`nurse_home_id`) USING BTREE,
+  KEY `sub_org_id` (`sub_org_id`) USING BTREE,
+  KEY `org_ids` (`org_id`,`sub_org_id`,`nurse_home_id`,`nurse_admin_id`) USING BTREE,
+  KEY `org_id` (`org_id`) USING BTREE,
+  KEY `index_admin_user_id` (`nurse_admin_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=155 DEFAULT CHARSET=utf8mb4 COMMENT='机构养老院关联表'
+
+
+==================
+db_nursing_crm.tb_membership_apply
+==================
+CREATE TABLE `tb_membership_apply` (
+  `apply_id` bigint(20) unsigned NOT NULL COMMENT '申请id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(11) unsigned NOT NULL COMMENT '机构id',
+  `customer_id` bigint(20) unsigned NOT NULL COMMENT '意向客户id',
+  `name` varchar(20) NOT NULL COMMENT '姓名',
+  `sex_option` int(11) unsigned DEFAULT NULL COMMENT '性别选项id',
+  `birthday` datetime DEFAULT NULL COMMENT '生日',
+  `phone` varchar(20) DEFAULT NULL COMMENT '联系电话',
+  `credent_type` int(11) unsigned DEFAULT NULL COMMENT '证件类型',
+  `id_card_no` varchar(20) DEFAULT NULL COMMENT '证件号',
+  `nationality` varchar(50) DEFAULT NULL COMMENT '国籍',
+  `native_province` bigint(11) DEFAULT NULL COMMENT '户籍省',
+  `native_city` bigint(11) DEFAULT NULL COMMENT '户籍市',
+  `native_area` bigint(11) DEFAULT NULL COMMENT '户籍区',
+  `native_address` varchar(200) DEFAULT NULL COMMENT '户籍地址',
+  `live_province` bigint(11) DEFAULT NULL COMMENT '居住省',
+  `live_city` bigint(11) DEFAULT NULL COMMENT '居住市',
+  `live_area` bigint(11) DEFAULT NULL COMMENT '居住区',
+  `live_address` varchar(200) DEFAULT NULL COMMENT '居住地址',
+  `company` varchar(20) DEFAULT NULL COMMENT '所在单位',
+  `job` varchar(20) DEFAULT NULL COMMENT '职务',
+  `hobbies` varchar(20) DEFAULT NULL COMMENT '兴趣特长',
+  `physical_condition` varchar(20) DEFAULT NULL COMMENT '身体状况',
+  `disease_history` varchar(20) DEFAULT NULL COMMENT '有无重大病史、传染病或家族遗传病史',
+  `membership_id` int(11) unsigned DEFAULT NULL COMMENT '预申请会籍id',
+  `membership_name` varchar(20) DEFAULT NULL COMMENT '预申请会籍名称',
+  `room_type_option` int(11) unsigned DEFAULT NULL COMMENT '户型选项id',
+  `checkin_time_option` int(11) unsigned DEFAULT NULL COMMENT '何时入住选项id',
+  `checkin_date` datetime DEFAULT NULL COMMENT '预计入住日期',
+  `checkin_count_option` int(11) unsigned DEFAULT NULL COMMENT '入住人数选项id',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态1申请中 2签约中 3已签约',
+  `del_flag` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  PRIMARY KEY (`apply_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会籍申请表'
+
+
+==================
+db_nursing_crm.tb_fee
+==================
+CREATE TABLE `tb_fee` (
+  `fee_id` bigint(20) unsigned NOT NULL COMMENT '费用id',
+  `org_id` int(11) unsigned NOT NULL COMMENT '集团id',
+  `sub_org_id` int(11) unsigned NOT NULL COMMENT '机构id',
+  `number` varchar(50) DEFAULT NULL COMMENT '编号',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `fee_type` tinyint(1) unsigned NOT NULL COMMENT '费用类型 1收入 2支出',
+  `type` tinyint(1) unsigned NOT NULL COMMENT '业务类型 1会籍订金 2会籍费用 3退订金 4退会籍费 5转让会籍费',
+  `relation_id` bigint(20) unsigned NOT NULL COMMENT '关联id（定金，会籍，转让）',
+  `membership_name` varchar(20) DEFAULT NULL COMMENT '会籍名称',
+  `amount` decimal(12,4) DEFAULT '0.0000' COMMENT '金额',
+  `confirm_amount` decimal(12,4) DEFAULT '0.0000' COMMENT '确认金额',
+  `confirm_time` datetime DEFAULT NULL COMMENT '确认时间,收款时间',
+  `confirm_user_id` int(11) unsigned DEFAULT NULL COMMENT '确认人',
+  `receive_type_option` int(11) unsigned DEFAULT NULL COMMENT '收费方式id',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0未收费 1已收费 2打回 3失效',
+  `del_flag` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  `source` tinyint(1) unsigned DEFAULT NULL COMMENT '费用来源',
+  `is_installment` tinyint(1) unsigned DEFAULT NULL COMMENT '是否分期：0否 1是',
+  `overdue_type` tinyint(2) DEFAULT '1' COMMENT '滞纳金类型1=比例2=金额',
+  `overdue_amount` decimal(10,2) DEFAULT '0.00' COMMENT '滞纳金额&比例',
+  `model_status` tinyint(4) DEFAULT '0' COMMENT '0默认情况 1包含分期',
+  `exempt_overdue_fine` tinyint(3) DEFAULT NULL COMMENT '是否豁免滞纳金<保利2.0.2版本>（  1-为已豁免  null或者0为不豁免）',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`fee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='费用表'
+
+
+==================
+db_nursing_crm.tb_fee_detail
+==================
+CREATE TABLE `tb_fee_detail` (
+  `detail_id` bigint(20) unsigned NOT NULL COMMENT 'id',
+  `fee_id` bigint(20) unsigned NOT NULL COMMENT '费用id',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `create_user_id` int(11) unsigned NOT NULL COMMENT '创建人',
+  `name` varchar(20) DEFAULT NULL COMMENT '缴费人',
+  `pre_receive_time` datetime DEFAULT NULL COMMENT '计划截止时间',
+  `confirm_time` datetime DEFAULT NULL COMMENT '确认时间',
+  `confirm_user_id` int(11) unsigned DEFAULT NULL COMMENT '确认人',
+  `receive_type_option` int(11) unsigned DEFAULT NULL COMMENT '收费方式id',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0未收费 1已收费',
+  `payment_detail_id` bigint(20) unsigned DEFAULT NULL COMMENT '支付详情id',
+  `overdue_fine` decimal(12,4) DEFAULT '0.0000' COMMENT '滞纳金',
+  `amount` decimal(12,4) DEFAULT '0.0000' COMMENT '确认金额',
+  `confirm_amount` decimal(12,4) DEFAULT '0.0000' COMMENT '确认金额(当前分期的实际已收取)',
+  `deposits_amount` decimal(12,4) DEFAULT '0.0000' COMMENT '订金抵扣字段',
+  `stage_sum` decimal(12,4) DEFAULT '0.0000' COMMENT '已收分期金额',
+  `occupation_sum` decimal(12,4) DEFAULT '0.0000' COMMENT '已收占用费',
+  `overdue_sum` decimal(12,4) DEFAULT '0.0000' COMMENT '已收滞纳金',
+  `other_money_amount` decimal(10,2) DEFAULT '0.00' COMMENT '其他金额抵扣字段',
+  PRIMARY KEY (`detail_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='费用详情表'
+
+
+==================
+db_nursing_home.tb_old_man_extend
+==================
+CREATE TABLE `tb_old_man_extend` (
+  `old_man_id` int(11) unsigned NOT NULL,
+  `linkman` varchar(10) DEFAULT NULL,
+  `linkman_phone` varchar(50) DEFAULT NULL,
+  `nation` int(11) unsigned DEFAULT NULL COMMENT '民族',
+  `social_security_card` varchar(255) DEFAULT NULL COMMENT '社保卡',
+  `card_place` varchar(255) DEFAULT NULL COMMENT '医保卡归属地',
+  `card_hospital` varchar(255) DEFAULT NULL COMMENT '定点医疗医院',
+  `education_degree` int(11) unsigned DEFAULT NULL COMMENT '文化程度',
+  `religion` int(11) unsigned DEFAULT NULL COMMENT '宗教信仰',
+  `marital_status` int(11) unsigned DEFAULT NULL COMMENT '婚姻状况',
+  `living_status` int(11) unsigned DEFAULT NULL COMMENT '居住情况',
+  `medical_costs` varchar(100) DEFAULT NULL COMMENT '医疗费用支付',
+  `finance_source` varchar(100) DEFAULT NULL COMMENT '经济来源',
+  `dementia` int(11) unsigned DEFAULT NULL COMMENT '痴呆',
+  `mental_disease` int(11) unsigned DEFAULT NULL COMMENT '精神疾病情况',
+  `sickness_history` varchar(255) DEFAULT NULL COMMENT '疾病史(暂时不用 还用原来得)',
+  `credent_type` int(11) unsigned DEFAULT NULL COMMENT '证件类型 1:身份证',
+  `native_address` varchar(200) DEFAULT NULL COMMENT '籍贯地址',
+  `guardian` varchar(20) DEFAULT NULL COMMENT '监护人',
+  `guardian_contactInfo` varchar(20) DEFAULT NULL COMMENT '监护人联系方式',
+  `guardian_phone` varchar(20) DEFAULT NULL COMMENT '监护人手机号',
+  `guardian_relationship` varchar(20) DEFAULT NULL COMMENT '监护人与长者的关系',
+  `guardian_email` varchar(50) DEFAULT NULL COMMENT '监护人邮箱',
+  `native_place` varchar(50) DEFAULT NULL COMMENT '籍贯',
+  `live_address` varchar(200) DEFAULT NULL COMMENT '居住地址',
+  `live_city` varchar(100) DEFAULT NULL COMMENT '居住城市',
+  `nursing_level` varchar(20) DEFAULT NULL COMMENT '护理等级',
+  `ability_level` int(11) unsigned DEFAULT NULL COMMENT '能力等级',
+  `politic_countenance` int(11) unsigned DEFAULT NULL COMMENT '政治面貌',
+  `blood_type` int(11) unsigned DEFAULT NULL COMMENT '血型',
+  `is_local_household_registration` int(11) unsigned DEFAULT NULL COMMENT '是否本市户籍',
+  `retirement_career` int(11) unsigned DEFAULT NULL COMMENT '退休职业',
+  `birthday_type` int(11) unsigned DEFAULT '40044' COMMENT '生日类型',
+  `nursing_grade_id` bigint(20) DEFAULT NULL COMMENT '护理等级id（护理计划）',
+  `emergency_name` varchar(20) DEFAULT NULL COMMENT '紧急联系人姓名',
+  `emergency_relationship` varchar(20) DEFAULT NULL COMMENT '紧急联系人与长者的关系',
+  `emergency_contactInfo` varchar(20) DEFAULT NULL COMMENT '紧急联系人联系方式',
+  `province` bigint(20) DEFAULT NULL COMMENT '省(出生地,华润需求)',
+  `city` bigint(20) DEFAULT NULL COMMENT '市(出生地,华润需求)',
+  `area` bigint(20) DEFAULT NULL COMMENT '区(出生地,华润需求)',
+  `address` varchar(255) DEFAULT NULL COMMENT '地址(华润需求)',
+  `medical` int(11) DEFAULT NULL COMMENT '医疗类别',
+  `income_source` varchar(255) DEFAULT NULL COMMENT '收入来源（1-机关事业单位离退休金 2-城镇职工养老保险金 3-城乡居民养老保险 4-供养人员补贴 5-低保金 6-子女抚养补贴 7-亲友资助 8-其它）',
+  `son_number` int(11) DEFAULT NULL COMMENT '儿子数量',
+  `daughter_number` int(11) DEFAULT NULL COMMENT '女儿数量',
+  `jg_province_id` varchar(20) DEFAULT NULL COMMENT '籍贯省份id',
+  `jg_city_id` varchar(20) DEFAULT NULL COMMENT '籍贯市级id',
+  `hj_province_id` varchar(20) DEFAULT NULL COMMENT '长者户籍省份id',
+  `hj_city_id` varchar(20) DEFAULT NULL COMMENT '长者户籍市级id',
+  `hj_district_id` varchar(20) DEFAULT NULL COMMENT '长者户籍区级id',
+  `hj_detailed_address` varchar(255) DEFAULT NULL COMMENT '长者户籍详细地址',
+  `jz_province_id` varchar(20) DEFAULT NULL COMMENT '长者居住省份id',
+  `jz_city_id` varchar(20) DEFAULT NULL COMMENT '长者居住市级id',
+  `jz_district_id` varchar(20) DEFAULT NULL COMMENT '长者居住区级id',
+  `jz_detailed_address` varchar(255) DEFAULT NULL COMMENT '长者居住详细地址',
+  `jh_province_id` varchar(20) DEFAULT NULL COMMENT '监护人居住省份id',
+  `jh_city_id` varchar(20) DEFAULT NULL COMMENT '监护人居住市级id',
+  `jh_district_id` varchar(20) DEFAULT NULL COMMENT '监护人居住区级id',
+  `jh_detailed_address` varchar(255) DEFAULT NULL COMMENT '监护人居住详细地址',
+  `jj_province_id` varchar(20) DEFAULT NULL COMMENT '紧急联系人居住省份id',
+  `jj_city_id` varchar(20) DEFAULT NULL COMMENT '紧急联系人居住市级id',
+  `jj_district_id` varchar(20) DEFAULT NULL COMMENT '紧急联系人居住区级id',
+  `jj_detailed_address` varchar(255) DEFAULT NULL COMMENT '紧急联系人居住详细地址',
+  `nation_str` varchar(255) DEFAULT NULL COMMENT '民族String',
+  `religion_str` varchar(255) DEFAULT NULL COMMENT '宗教String',
+  `jg_full_address` varchar(255) DEFAULT NULL COMMENT '籍贯总详细地址',
+  `jz_full_address` varchar(255) DEFAULT NULL COMMENT '居住总地址',
+  `hj_full_address` varchar(255) DEFAULT NULL COMMENT '户籍总地址',
+  `jh_full_address` varchar(255) DEFAULT NULL COMMENT '监护人总地址',
+  `jj_full_address` varchar(255) DEFAULT NULL COMMENT '经济联系人总地址',
+  PRIMARY KEY (`old_man_id`),
+  UNIQUE KEY `uniq__lp` (`linkman_phone`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='养老人员基本信息扩展字段'
+
+

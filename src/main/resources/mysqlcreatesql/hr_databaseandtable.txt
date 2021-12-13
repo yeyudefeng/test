@@ -1,0 +1,34 @@
+db_pension_organization.tb_advisory_customer
+db_pension_organization.tb_intention_customer
+db_pension_organization.tb_customer_visit_record
+db_csleep_account.tb_admin_sub_org
+db_csleep_account.tb_admin_org
+## db_acquire_data.tb_city
+## db_acquire_data.tb_province
+## db_acquire_data.tb_area
+## db_acquire_data.tb_partition
+## db_acquire_data.tb_country
+db_nursing_crm.tb_intentional_customer
+db_csleep_account.tb_worker_new
+db_nursing_crm.tb_intentional_customer_channel
+db_nursing_crm.tb_intentional_customer_visit
+db_nursing_crm.tb_contract_deposit
+db_nursing_crm.tb_contract_sign
+db_nursing_crm.tb_membership_transfer
+db_nursing_crm.tb_membership_withdraw
+db_nursing_crm.tb_membership_owner
+db_nursing_crm.tb_card_product
+db_nursing_home.tb_location_room
+db_nursing_crm.tb_card
+db_nursing_home.tb_nursing_homes_baseinfo
+db_nursing_home.tb_org_nurse
+db_nursing_crm.tb_membership_apply
+db_nursing_crm.tb_fee
+db_nursing_crm.tb_fee_detail
+## db_account.tb_account
+db_nursing_home.tb_old_man_extend
+db_nursing_home.tb_location_bed
+db_nursing_home.tb_location_room
+db_nursing_home.tb_location_floor
+db_nursing_home.tb_location_building
+db_csleep_account.tb_admin_org

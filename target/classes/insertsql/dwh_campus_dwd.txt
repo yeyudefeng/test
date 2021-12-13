@@ -1,0 +1,1637 @@
+===========================
+    clife_campus_dwd_health_stu
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_health_stu partition(part_date)
+select
+  t.student_id                 -- '学生id'
+  ,t.student_name               -- '姓名'
+  ,t.sex                        -- '1-男 2-女 3-其他'
+  ,t.age                        --  '年龄'
+  ,t.class_id                   -- '班级id'
+  ,t.class_name                 -- '班级名称'
+  ,t.grade_id                   -- '年级id'
+  ,t.grade_name                 -- '年级名称'
+  ,t.org_id                     -- '学校id'
+  ,t.org_name                   -- '学校名称'
+  ,t.area_id 				     -- '区县id'
+  ,a.serious_disease_history 	     -- '各种严重病史'
+  ,a.serious_disease_history_details      -- '严重病史详情'
+  ,a.infectious_disease_history     -- '各种传染病史'
+  ,a.infectious_disease_history_details   -- '传染病史详情'
+  ,c.weight                     -- '体重（单位：kg）'
+  ,c.`level`              -- '0：中上，1：中等，2：中下'
+  ,c.height                     -- '身高（单位：cm）'
+  ,c.height_level              -- '0：中上，1：中等，2：中下'
+  ,c.bmi                        -- 'bmi数值'
+  ,case when c.bmi<e.value1 then 0 
+        when c.bmi>=e.value1 and c.bmi<e.value3 then 1
+		when c.bmi>=e.value3 and c.bmi<e.value4 then 2
+		when c.bmi>=e.value4 then 3
+		else null end as bmi_assess                 -- '身材正常状态）  0：偏瘦  1：标准  2：超重  3：肥胖 99-其它'
+  ,a.left_eye                   -- '左眼健康'
+  ,a.right_eye                  -- '右眼健康'
+  ,b.left_vision                -- '左视力'
+  ,b.right_vision               -- '右视力'
+  ,case when b.left_abnormal =0 then 2 else b.left_abnormal	end	left_abnormal		     -- '左视力健康'
+  ,case when b.right_abnormal =0 then 2 else b.right_abnormal end right_abnormal		 -- '右视力健康'
+  ,a.number_of_caries           -- '龋齿数'
+  ,a.number_of_teeth            -- '牙齿数量'
+  ,a.head_neck 				 -- ' 头颈'
+  ,a.thoracic 					 -- '胸廓'
+  ,a.spine 					 -- '脊椎'
+  ,a.limbs 					 -- '四肢'
+  ,a.pharynx 					 -- '咽部'
+  ,a.heart 					 -- '心'
+  ,a.lung 						 -- '肺'
+  ,a.liver 					 -- '肝'
+  ,a.spleen 					 -- '脾'
+  ,a.hemoglobin 				 -- '血红蛋白（单位：g/h）'
+  ,a.alt 						 -- '丙氨酸氨基转移酶'
+  ,a.lack 						 -- '接种情况'
+  ,a.whether_allergy 			 --'是否过敏体质，0：否，1：是'
+  ,d.allergy_ingredients        -- '过敏食材'
+  ,t.part_date
+from 
+dwh_dw_campus.clife_campus_dim_student t 
+left join 
+(select t2.* from (
+select 
+  t1.*,
+  row_number() over(partition by student_data_id order by update_time desc) as ranks
+  from
+  dwh_ods_campus_new.clife_campus_ods_stu_health t1
+where part_date=regexp_replace(date_sub(current_date(),1),'-','') and status=1 and deleted=1
+) t2 where t2.ranks=1)
+ a  
+on t.student_id=a.student_data_id
+left join 
+( 
+select t2.* from 
+(select 
+t1.*
+,row_number() over(partition by student_id order by upload_time desc) as ranks
+ from dwh_ods_campus_new.clife_campus_ods_vision_data t1
+ where part_date=regexp_replace(date_sub(current_date(),1),'-','')) t2 where t2.ranks=1
+) b 
+on t.student_id=b.student_id
+left join 
+(
+select t2.* from (
+select 
+t1.*
+,row_number() over(partition by student_id order by upload_time desc) as ranks
+ from dwh_ods_campus_new.clife_campus_ods_student_body_data t1
+ where part_date=regexp_replace(date_sub(current_date(),1),'-','') and status=1) t2 where t2.ranks=1 
+) c 
+on t.student_id=c.student_id
+left join 
+(
+select 
+b1.student_id,
+concat_ws(',',collect_set(cast(b1.ingredient_id as string))) as allergy_ingredients 
+from dwh_ods_campus_new.clife_campus_ods_student_allergy_ingredients b1 
+where b1.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+group by b1.student_id 
+) d 
+on t.student_id=d.student_id
+left join 
+dwh_ods_campus_new.clife_campus_ods_public_standard_bmi e
+on t.sex=e.bmi_sex and t.age=e.bmi_age and  t.`month`=e.`month` and e.bmi_type=1
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','') and t.status=1 and t.deleted=1
+
+
+===========================
+    clife_campus_dwd_robot_check_report
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_robot_check_report partition(part_date)
+select 
+ a.data_id          -- '主键标识'
+,a.student_id  	  -- '学生唯一标识'
+,b.student_name     -- '学生姓名'
+,b.sex              -- '性别'
+,b.age              -- '年龄'
+,b.class_id         -- '班级id'
+,b.class_name       -- '班级名称' 
+,b.grade_id         -- '年级id'
+,b.grade_name       -- '年级名称'
+,b.org_id           -- '学校id'
+,b.org_name         -- '学校名称'
+,b.area_id          -- '学校区县id'
+,a.measure_time     -- '晨检时间'
+,a.device_id        -- '设备ID'
+,a.mac_address      -- 'MAC地址'
+,a.product_id       -- '产品标识'
+,a.card_no          -- '卡号'
+,a.temperature      -- '体温'
+,a.level            -- '体温状态'
+,a.hand             -- '手部异常'
+,a.mouth            -- '口腔异常'
+,a.red_eye          -- '红眼'
+,a.fever            -- '发烧'
+,a.cheek            -- '腮部肿大'
+,a.spirit           -- '精神不佳'
+,a.throat           -- '咽炎'
+,a.trauma           -- '外伤'
+,a.cough            -- '咳嗽'
+,a.fingernail       -- '指甲过长'
+,a.tooth_decay      -- '蛀牙'
+,a.other            -- '其他异常'
+,a.hand_img         -- '手部异常图像'
+,a.mouth_img        -- '口腔异常图像'
+,a.eye_img          -- '眼睛异常图像'
+,a.data_type        -- '数据类型'
+,a.abnormal_num     -- '异常数量'
+,a.upload_time      -- '上传时间'
+,case when a.access = 'Y' then 1 
+      when a.access = 'N' then 0 
+      else null end as access	  -- '是否允许入园(1-是、0-否)'
+,a.part_date
+from 
+ dwh_dw_campus.clife_campus_dim_student b
+ left join 
+ dwh_ods_campus_new.clife_campus_ods_robot_check_report a 
+ on a.student_id=b.student_id and a.part_date=regexp_replace(date_sub(current_date(),1),'-','')  and substr(a.measure_time,0,10)=date_sub(current_date(),1)
+where  b.part_date=regexp_replace(date_sub(current_date(),1),'-','') and b.status=1 and b.deleted=1
+
+
+===========================
+    clife_campus_dwd_water_drink_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_water_drink_info partition(part_date)
+select 
+	 a.data_id          -- '主键标识'
+	,a.student_id  	  -- '学生唯一标识'
+	,b.student_name     -- '学生姓名'
+	,b.sex              -- '性别'
+	,b.age              -- '年龄'
+	,b.class_id         -- '班级id'
+	,b.class_name       -- '班级名称' 
+	,b.grade_id         -- '年级id'
+	,b.grade_name       -- '年级名称'
+	,b.org_id           -- '学校id'
+	,b.org_name         -- '学校名称'
+	,b.area_id          -- '学校区县id'
+	,a.device_no        -- '设备编号'
+   ,a.cdate            -- '刷卡时间'
+   ,a.card_no          -- '卡号'
+   ,a.water_amount     -- '出水量'
+   ,a.is_auto          -- '是否自动'
+   ,a.intds            -- '进水TDS'
+   ,a.outtds           -- '出水TDS'
+   ,a.temperature      -- '饮水温度'
+   ,a.time_integer     -- '时分秒整数'
+   ,a.device_type      -- '净饮机类型'
+   ,a.create_time      -- '创建时间'
+   ,a.device_position  -- '饮水机位置'
+	,a.part_date
+from 
+ dwh_ods_campus_new.clife_campus_ods_water_drink_record a
+ left join 
+ dwh_dw_campus.clife_campus_dim_student b 
+ on a.student_id=b.student_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+ where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and substr(a.create_time,1,10)=date_sub(current_date(),1)
+
+
+===========================
+    clife_campus_dwd_thermometer_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_thermometer_info partition(part_date)
+select 
+	 a.thermometer_id   -- '主键标识'
+	,a.student_id  	  -- '学生唯一标识'
+	,b.student_name     -- '学生姓名'
+	,b.sex              -- '性别'
+	,b.age              -- '年龄'
+	,b.class_id         -- '班级id'
+	,b.class_name       -- '班级名称' 
+	,b.grade_id         -- '年级id'
+	,b.grade_name       -- '年级名称'
+	,b.org_id           -- '学校id'
+	,b.org_name         -- '学校名称'
+	,b.area_id          -- '学校区县id'
+    ,a.device_id        -- '设备编号'
+    ,a.value            -- '体温值'
+	,a.level            -- '体温正常状态'
+	,a.measure_time -- '测量时间'
+	,a.upload_time -- '上传时间'
+	,a.source           -- '数据来源'
+	,a.status           -- '是否有效'
+	,a.if_check         -- '是否审核'
+	,a.part_date
+from 
+ dwh_ods_campus_new.clife_campus_ods_thermometer_data a
+ left join 
+ dwh_dw_campus.clife_campus_dim_student b 
+ on a.student_id=b.student_id and b.deleted = 1 and b.status = 1 and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and substr(a.upload_time,0,10)=date_sub(current_date(),1)
+
+
+
+===========================
+    clife_campus_dwd_student_attendance_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_student_attendance_info partition(part_date)
+select  
+    b.student_id, --'学生唯一id'
+    b.student_name, --'学生姓名'
+    b.sex,         --'性别'
+    b.age,          --'年龄'
+  	b.class_id,     --'班级id'     
+  	b.class_name,   --'班级名称'
+  	b.grade_id,     --'年级id'
+  	b.grade_name,   --'年级名称'
+  	b.org_id,       --'学校id'
+ 	b.org_name,     --'学校名称'
+  	b.area_id,      --'学校区县id'
+  	substr(a.data_time,1,10),
+  	a.am_card_time, --'入园时间'
+  	a.pm_card_time, --'离园时间'
+  	a.`result`,     --状态
+ 	a.content,      --'内容'
+    a.update_time,  --'更新时间'
+    a.update_by_user, --'更新人'
+    a.card_url,      --'打卡图片'
+    a.am_url,        --'打卡图片-入园'
+    a.pm_url,        --'打卡图片-离园'
+    regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from 
+ dwh_ods_campus_new.clife_campus_ods_student_attendance_daily a
+ left join 
+ dwh_dw_campus.clife_campus_dim_student b 
+ on a.student_id=b.student_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','') and b.status=1 and b.deleted=1
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and substr(a.update_time,1,10)=date_sub(current_date(),1)
+
+
+
+===========================
+    clife_campus_dwd_sleep_day_data
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_sleep_day_data partition(part_date)
+select 
+  a.student_id                 -- '学生id'
+  ,a.student_name               -- '姓名'
+  ,a.sex                        -- '1-男 2-女 3-其他'
+  ,a.age                        --  '年龄'
+  ,a.class_id                   -- '班级id'
+  ,a.class_name                 -- '班级名称'
+  ,a.grade_id                   -- '年级id'
+  ,a.grade_name                 -- '年级名称'
+  ,a.org_id                     -- '学校id'
+  ,a.org_name                   -- '学校名称'
+  ,a.area_id 				     -- '区县id'
+  ,b.device_no                  -- '设备编号'
+  ,b.sleep_duration             -- '睡眠时长（秒）'
+  ,b.wake_duration              -- '清醒时长（秒）'
+  ,b.wake_number                -- '清醒次数'
+  ,b.score                      -- '睡眠打分'
+  ,c.start_time                -- '睡眠状态开始时间'
+  ,c.end_time                   -- '睡眠状态结束时间'
+  ,b.upload_time                -- '上传时间'
+  ,b.create_time                -- '创建时间'
+  ,b.source                     -- '数据来源(1-天波手环，3-睡眠带子)'
+  ,a.part_date
+from 
+dwh_dw_campus.clife_campus_dim_student a 
+left join 
+dwh_ods_campus_new.clife_campus_ods_sleep_day_data b 
+on a.student_id=b.student_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','') and substr(b.upload_time,0,10)=date_sub(current_date(),1)
+left join 
+(
+select 
+student_id,substr(start_time,0,10) as `date`,
+min(start_time) start_time,
+max(end_time) end_time
+from (
+select *,
+case when status=7 then start_time else null end as end_time
+from dwh_ods_campus_new.clife_campus_ods_sleep_day_status 
+where part_date=regexp_replace(date_sub(current_date(),1),'-','') and substr(start_time,0,10)=date_sub(current_date(),1)
+) t1  
+group by t1.student_id,substr(start_time,0,10)
+) c 
+on a.student_id=c.student_id  and substr(b.upload_time,0,10)=c.`date`
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and a.status=1 and a.deleted=1
+
+
+===========================
+    clife_campus_dwd_sports_record
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_sports_record partition(part_date)
+select 
+   a.data_id                    -- '主键标识'
+  ,a.student_id                 -- '学生唯一标识'
+  ,b.student_name               -- '姓名'
+  ,b.sex                        -- '1-男 2-女 3-其他'
+  ,b.age                        --  '年龄'
+  ,b.class_id                   -- '班级id'
+  ,b.class_name                 -- '班级名称'
+  ,b.grade_id                   -- '年级id'
+  ,b.grade_name                 -- '年级名称'
+  ,b.org_id                     -- '学校id'
+  ,b.org_name                   -- '学校名称'
+  ,b.area_id                      -- '区县id'
+  ,a.device_no                  -- '设备编号'
+  ,a.`value`                    -- '步数'
+  ,a.`level`                    -- '保留'
+  ,a.source                     -- '数据来源：1-手环；2-家长APP；3-手表'
+  ,a.measure_time               -- '测量时间'
+  ,a.upload_time               -- '数据上传时间'
+  ,a.step_type                  -- '步数类型：81-小时步数，111-总步数'
+  ,a.from_type                  -- '来源类型：1-app,2-ap盒子'
+  ,regexp_replace(substr(a.measure_time,0,10),'-','')   as part_date               -- '测量时间'
+from (
+select 
+ * 
+from dwh_ods_campus_new.clife_campus_ods_sports_record where part_date = regexp_replace(date_sub(current_date(),1),'-','') 
+         and substr(measure_time,0,10) > date_sub(current_date(),10)
+) a 
+left join (
+select 
+ * 
+from dwh_dw_campus.clife_campus_dim_student where part_date > regexp_replace(date_sub(current_date(),10),'-','')
+) b 
+on a.student_id=b.student_id and regexp_replace(substr(a.measure_time,0,10),'-','')=b.part_date and b.status=1 and b.deleted=1
+
+
+===========================
+    clife_campus_dwd_disposition_stu_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_disposition_stu_info partition(part_date)
+select
+     t.student_id             -- '学生id'
+    ,t.student_name           -- '姓名'
+    ,t.sex                    -- '性别'
+    ,t.age                    -- '年龄'
+    ,t.class_id               -- '班级id'
+    ,t.class_name             -- '班级名称'
+    ,t.grade_id               -- '年级id'
+    ,t.grade_name             -- '年级名称'
+    ,t.org_id                 -- '学校id'
+    ,t.org_name               -- '学校名称'
+    ,t3.area_id    as org_area_id   -- '学校县区id'
+    ,t4.area_name  as org_area_name -- '学校县区名称'
+    ,mens_score_1                    --外向性测评结果分	
+    ,mens_t_score_1                --外向性测评结果t分	
+    ,mens_level_1                    --外向性测评结果	
+    ,mens_result_1                  --外向性结果等级	
+    ,mens_is_normal_1            --外向性是否正常	
+    ,mens_recommend_name_1  --外向性推荐方案	
+    ,manage_info_name_1   --外向性测评名称	
+    ,start_time_1               --外向性有效开始测评时间	
+    ,end_time_1                   --外向性有效截止时间	
+    ,mens_score_5                    --开放性测评结果分	
+    ,mens_t_score_5                --开放性测评结果t分	
+    ,mens_result_5                  --开放性测评结果	
+    ,mens_level_5                    --开放性结果等级	
+    ,mens_is_normal_5            --开放性是否正常	
+    ,mens_recommend_name_5  --开放性推荐方案	
+    ,manage_info_name_5   --开放性测评名称	
+    ,start_time_5               --开放性有效开始测评时间	
+    ,end_time_5                   --开放性有效截止时间	
+    ,mens_score_9                    --宜人性测评结果分	
+    ,mens_t_score_9                --宜人性测评结果t分	
+    ,mens_result_9                  --宜人性测评结果	
+    ,mens_level_9                    --宜人性结果等级	
+    ,mens_is_normal_9            --宜人性是否正常	
+    ,mens_recommend_name_9  --宜人性推荐方案	
+    ,manage_info_name_9   --宜人性测评名称	
+    ,start_time_9               --宜人性有效开始测评时间	
+    ,end_time_9                   --宜人性有效截止时间	
+    ,mens_score_13                       --责任心测评结果分	
+    ,mens_t_score_13                   --责任心测评结果t分	
+    ,mens_result_13                     --责任心测评结果	
+    ,mens_level_13                       --责任心结果等级	
+    ,mens_is_normal_13               --责任心是否正常	
+    ,mens_recommend_name_13     --责任心推荐方案	
+    ,manage_info_name_13      --责任心测评名称	
+    ,start_time_13                  --责任心有效开始测评时间	
+    ,end_time_13                      --责任心有效截止时间		
+    ,mens_score_17                   --情绪稳定性测评结果分	
+    ,mens_t_score_17               --情绪稳定性测评结果t分	
+    ,mens_result_17                 --情绪稳定性测评结果	
+    ,mens_level_17                   --情绪稳定性结果等级	
+    ,mens_is_normal_17           --情绪稳定性是否正常	
+    ,mens_recommend_name_17 --情绪稳定性推荐方案	
+    ,manage_info_name_17  --情绪稳定性测评名称	
+    ,start_time_17              --情绪稳定性有效开始测评时间	
+    ,end_time_17                  --情绪稳定性有效截止时间	
+    ,mode_type_1	          --人格为外向性下的特性id
+    ,mode_type_score_1	  --外倾性得分
+    ,mode_type_5	          --人格为开放性下的特性id
+    ,mode_type_score_5     --开放性得分
+    ,mode_type_9	          --人格为宜人性下的特性id
+    ,mode_type_score_9     --宜人性得分
+    ,mode_type_13	      --人格为责任心下的特性id
+    ,mode_type_score_13    --责任心得分
+    ,mode_type_17	      --人格为情绪稳定性下的特性id
+    ,mode_type_score_17    --情绪稳定性得分
+    ,tags_normal          --正常标签
+    ,tags_negative        --负面标签	
+    ,cast((case when mens_t_score_1 is null then null
+                     when mode_type_score_1 is null then mens_t_score_1
+                else (mens_t_score_1*0.6)+(mode_type_score_1*0.4)  end) as int ) as synthesis_score_1  --综合外倾性人格得分
+    ,cast((case when mens_t_score_5 is null then null
+                     when mode_type_score_5 is null then mens_t_score_5
+                else (mens_t_score_5*0.6)+(mode_type_score_5*0.4)  end) as int ) as synthesis_score_5  --综合开放性人格得分
+    ,cast((case when mens_t_score_9 is null then null
+                     when mode_type_score_9 is null then mens_t_score_9
+                else (mens_t_score_9*0.6)+(mode_type_score_9*0.4)  end) as int ) as synthesis_score_9  --综合宜人性人格得分
+    ,cast((case when mens_t_score_13 is null then null
+                     when mode_type_score_13 is null then mens_t_score_13
+                else (mens_t_score_13*0.6)+(mode_type_score_13*0.4)  end) as int ) as synthesis_score_13  --综合责任心人格得分
+    ,cast((case when mens_t_score_17 is null then null
+                     when mode_type_score_17 is null then mens_t_score_17
+                else (mens_t_score_17*0.6)+(mode_type_score_17*0.4)  end) as int ) as synthesis_score_17  --综合情绪稳定性人格得分
+    ,regexp_replace(date_sub(current_date(),1),'-','')
+from 
+(
+  select * from dwh_dw_campus.clife_campus_dim_student
+  where part_date = regexp_replace(date_sub(current_date(),1),'-','') 
+)t
+left join
+(
+  select
+       student_id
+      ,max(case when b.name = '155' then a.score else null end)            as mens_score_1                    --外向性测评结果分
+  	  ,max(case when b.name = '155' then a.t_score else null end)          as mens_t_score_1                --外向性测评结果t分
+  	  ,max(case when b.name = '155' then a.level else null end)            as mens_level_1                    --外向性测评结果
+  	  ,max(case when b.name = '155' then a.result else null end)           as mens_result_1                  --外向性结果等级
+  	  ,max(case when b.name = '155' then a.is_normal else null end)        as mens_is_normal_1            --外向性是否正常
+  	  ,max(case when b.name = '155' then a.recommend_name else null end)   as mens_recommend_name_1  --外向性推荐方案
+  	  ,max(case when b.name = '155' then c.manage_info_name else null end) as manage_info_name_1   --外向性测评名称
+  	  ,max(case when b.name = '155' then c.start_time else null end)       as start_time_1               --外向性有效开始测评时间
+  	  ,max(case when b.name = '155' then c.end_time else null end)         as end_time_1                   --外向性有效截止时间
+  	  ,max(case when b.name = '156' then a.score else null end)            as mens_score_5                    --开放性测评结果分
+  	  ,max(case when b.name = '156' then a.t_score else null end)          as mens_t_score_5                --开放性测评结果t分
+  	  ,max(case when b.name = '156' then a.result else null end)           as mens_result_5                  --开放性测评结果
+  	  ,max(case when b.name = '156' then a.level else null end)            as mens_level_5                    --开放性结果等级
+  	  ,max(case when b.name = '156' then a.is_normal else null end)        as mens_is_normal_5            --开放性是否正常
+  	  ,max(case when b.name = '156' then a.recommend_name else null end)   as mens_recommend_name_5  --开放性推荐方案
+      ,max(case when b.name = '156' then c.manage_info_name else null end) as manage_info_name_5   --开放性测评名称
+      ,max(case when b.name = '156' then c.start_time else null end)       as start_time_5               --开放性有效开始测评时间
+  	  ,max(case when b.name = '156' then c.end_time else null end)         as end_time_5                   --开放性有效截止时间
+  	  ,max(case when b.name = '157' then a.score else null end)            as mens_score_9                    --宜人性测评结果分
+  	  ,max(case when b.name = '157' then a.t_score else null end)          as mens_t_score_9                --宜人性测评结果t分
+  	  ,max(case when b.name = '157' then a.result else null end)           as mens_result_9                  --宜人性测评结果
+  	  ,max(case when b.name = '157' then a.level else null end)            as mens_level_9                    --宜人性结果等级
+  	  ,max(case when b.name = '157' then a.is_normal else null end)        as mens_is_normal_9            --宜人性是否正常
+  	  ,max(case when b.name = '157' then a.recommend_name else null end)   as mens_recommend_name_9  --宜人性推荐方案
+      ,max(case when b.name = '157' then c.manage_info_name else null end) as manage_info_name_9   --宜人性测评名称
+  	  ,max(case when b.name = '157' then c.start_time else null end)       as start_time_9               --宜人性有效开始测评时间
+  	  ,max(case when b.name = '157' then c.end_time else null end)         as end_time_9                   --宜人性有效截止时间
+  	  ,max(case when b.name = '158' then a.score else null end)            as mens_score_13                       --责任心测评结果分
+  	  ,max(case when b.name = '158' then a.t_score else null end)          as mens_t_score_13                   --责任心测评结果t分
+  	  ,max(case when b.name = '158' then a.result else null end)           as mens_result_13                     --责任心测评结果
+  	  ,max(case when b.name = '158' then a.level else null end)            as mens_level_13                       --责任心结果等级
+  	  ,max(case when b.name = '158' then a.is_normal else null end)        as mens_is_normal_13               --责任心是否正常
+  	  ,max(case when b.name = '158' then a.recommend_name else null end)   as mens_recommend_name_13     --责任心推荐方案
+      ,max(case when b.name = '158' then c.manage_info_name else null end) as manage_info_name_13      --责任心测评名称
+      ,max(case when b.name = '158' then c.start_time else null end)       as start_time_13                  --责任心有效开始测评时间
+      ,max(case when b.name = '158' then c.end_time else null end)         as end_time_13                      --责任心有效截止时间	
+      ,max(case when b.name = '159' then a.score else null end)        as mens_score_17                   --情绪稳定性测评结果分
+      ,max(case when b.name = '159' then a.t_score else null end)      as mens_t_score_17               --情绪稳定性测评结果t分
+      ,max(case when b.name = '159' then a.result else null end)       as mens_result_17                 --情绪稳定性测评结果
+      ,max(case when b.name = '159' then a.level else null end)        as mens_level_17                   --情绪稳定性结果等级
+      ,max(case when b.name = '159' then a.is_normal else null end)    as mens_is_normal_17           --情绪稳定性是否正常
+      ,max(case when b.name = '159' then a.recommend_name else null end)   as mens_recommend_name_17 --情绪稳定性推荐方案
+      ,max(case when b.name = '159' then c.manage_info_name else null end) as manage_info_name_17  --情绪稳定性测评名称
+      ,max(case when b.name = '159' then c.start_time else null end)       as start_time_17              --情绪稳定性有效开始测评时间
+      ,max(case when b.name = '159' then c.end_time else null end)         as end_time_17                  --情绪稳定性有效截止时间
+  from
+  (
+     select
+          tb.*
+     from
+     (
+        select
+             tr.*
+            ,row_number() over(partition by  student_id,manage_info_id order by end_time desc) as ranks
+        from dwh_ods_campus_new.clife_campus_ods_measurement_result tr
+        where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+          and `status` = 1 and end_time is not null
+     )tb
+     where tb.ranks = 1
+  )a
+  left join
+  (
+    select * from dwh_ods_campus_new.clife_campus_ods_config
+    where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+      and group_id = 10030 
+  )b on a.manage_info_id = b.name
+  left join
+  (
+    select * from dwh_ods_campus_new.clife_campus_ods_measurement_manage_info
+    where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+  )c on a.manage_info_id = c.manage_info_id
+  where b.group_id = 10030
+  group by student_id
+)t1 on t.student_id = t1.student_id
+left join
+(
+   select
+        student_id
+       ,mode_type_1
+       ,mode_type_score_1
+       ,mode_type_5
+       ,mode_type_score_5
+       ,mode_type_9
+       ,mode_type_score_9
+       ,mode_type_13
+       ,mode_type_score_13
+       ,mode_type_17
+       ,mode_type_score_17
+       ,concat_ws(',',collect_set(pv.notagName))  as tags_normal      --正常标签
+       ,concat_ws(',',collect_set(pe.netagName))  as tags_negative    --负面标签
+   from
+   (
+      select 
+           student_id
+          ,mode_type_1         --人格为外向性下的特性id
+          ,case when s1 is not null then ROUND(s1/c1) else null end mode_type_score_1      --外倾性得分
+          ,mode_type_5         --人格为开放性下的特性
+          ,case when s5 is not null then ROUND(s5/c5) else null end mode_type_score_5      --开放性得分
+          ,mode_type_9         --人格为宜人性下的特性
+          ,case when s9 is not null then ROUND(s9/c9) else null end mode_type_score_9      --宜人性得分
+          ,mode_type_13        --人格为责任心下的特性
+          ,case when s13 is not null then ROUND(s13/c13) else null end mode_type_score_13  --责任心得分
+          ,mode_type_17        --人格为情绪稳定性下的特性
+          ,case when s17 is not null then ROUND(s17/c17) else null end mode_type_score_17  --情绪稳定性得分
+          ,h.tags_normal
+          ,k.tags_negative
+      from 
+      (
+         select 
+              student_id               --学生id
+             ,sum(score_1)   as s1     --外倾性得分
+             ,count(score_1) as c1     --外倾性个数
+             ,sum(score_5)   as s5     --开放性得分
+             ,count(score_5) as c5     --开放性个数 
+             ,sum(score_9)   as s9     --宜人性得分
+             ,count(score_9) as c9     --宜人性个数
+             ,sum(score_13)    as s13  --责任心得分
+             ,count(score_13)  as c13  --责任心个数
+             ,sum(score_17)    as s17  --情绪稳定性得分
+             ,count(score_17)  as c17  --情绪稳定性个数
+             ,max(mode_type_1)    as mode_type_1     --人格为外向性下的特性id
+             ,max(mode_type_5)    as mode_type_5     --人格为开放性下的特性
+             ,max(mode_type_9)    as mode_type_9     --人格为宜人性下的特性
+             ,max(mode_type_13)   as mode_type_13     --人格为责任心下的特性
+             ,max(mode_type_17)   as mode_type_17     --人格为情绪稳定性下的特性
+             ,max(split(regexp_replace(regexp_extract(tags_normal,'^\\[(.+)\\]$',1),'\\}\\,\\{', '\\}\\|\\|\\{'),'\\|\\|'))    as tags_normal  --正常标签
+             ,max(split(regexp_replace(regexp_extract(tags_negative,'^\\[(.+)\\]$',1),'\\}\\,\\{', '\\}\\|\\|\\{'),'\\|\\|'))  as tags_negative    --负面标签
+         from 
+         (
+           select * from dwh_ods_campus_new.clife_campus_ods_report_disposition
+           where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+         )p        
+         group by student_id
+      )t lateral view outer explode(t.tags_normal) h as tags_normal
+         lateral view outer explode(t.tags_negative) k as tags_negative
+   )m lateral view json_tuple(m.tags_normal,'tagName')pv as notagName
+      lateral view json_tuple(m.tags_negative,'tagName')pe as netagName
+   group by student_id
+           ,mode_type_1
+           ,mode_type_score_1
+           ,mode_type_5
+           ,mode_type_score_5
+           ,mode_type_9
+           ,mode_type_score_9
+           ,mode_type_13
+           ,mode_type_score_13
+           ,mode_type_17
+           ,mode_type_score_17
+)t2 on t.student_id = t2.student_id
+left join
+(
+   select * from dwh_dw_campus.clife_campus_dim_org
+   where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+)t3 on t.org_id = t3.org_id
+left join
+(
+   select * from dwh_dw_campus.clife_campus_dim_area
+)t4 on t3.area_id = t4.area_id
+where t.part_date = regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dwd_location_stu
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_location_stu partition(part_date)
+select
+     a.data_id           
+    ,a.map_location_id        --'活动位置编号'
+    ,b.location_name          --'活动位置名称'
+    ,b.`type`                 --'类型'
+    ,a.time_length            --'学生停留时长(单位秒)'
+    ,a.enter_time             --'进入时间'
+    ,a.leave_time             --'离开时间'
+    ,a.activity_data          --'活动数据表示:1(是) '
+    ,a.source                 --'数据来源（1-米越，2-天波）'
+    ,a.student_id             --'学生唯一标识'
+    ,c.student_name           -- '姓名'
+    ,c.sex                    -- '1-男 2-女 3-其他'
+    ,c.age                    -- '年龄'
+    ,c.org_id                 -- '学校id'
+    ,c.org_name               -- '学校名称'
+    ,c.grade_id               -- '年级id'
+    ,c.grade_name             -- '年级名称'
+    ,c.class_id               -- '班级id'
+    ,c.class_name             -- '班级名称'
+    ,d.area_id    as org_area_id            -- '学校县区id'
+    ,e.area_name  as org_area_name          -- '学校县区名称'
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from
+(
+    select
+         data_id               --'主键标识'
+        ,student_id           --'学生唯一标识'
+        ,map_location_id      --'活动位置编号'
+        ,time_length          --'学生停留时长(单位秒)'
+        ,enter_time   --'进入时间'
+        ,leave_time   --'离开时间'
+        ,activity_data        --'活动数据表示:1(是) '
+        ,source               --'数据来源（1-米越，2-天波）'
+    from dwh_ods_campus_new.clife_campus_ods_student_location
+    where part_date = regexp_replace(date_sub(current_date(),1),'-','') and substr(update_time,0,10)=date_sub(current_date(),1)
+)a
+left join 
+(
+    select
+         map_location_id  --'活动位置编号'
+        ,location_name    --'活动位置名称'
+        ,status           --'状态：0-无效；1-有效'
+        ,type             --'类型'
+    from dwh_dw_campus.clife_campus_dim_interest_map_location
+    where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+)b on a.map_location_id = b.map_location_id
+left join
+(
+   select *
+   from dwh_dw_campus.clife_campus_dim_student
+   where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+)c on a.student_id = c.student_id
+left join
+(
+   select *
+   from dwh_dw_campus.clife_campus_dim_org
+   where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+)d on c.org_id = d.org_id
+left join
+(
+   select * from dwh_dw_campus.clife_campus_dim_area
+)e on d.area_id = e.area_id
+
+
+===========================
+    clife_campus_dwd_classroom_env_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_classroom_env_info partition(part_date)  --校验时，数据量一定是两个发散的综合
+select 
+   t.class_room_id --'教室id'
+  ,t.class_room_name --'教室名称'
+  ,t.class_id --'班级id'
+  ,g.class_name --'班级name'
+  ,t.school_id as org_id --'学校id'
+  ,k.org_name --'学校名称'
+  ,k.area_id     as   org_area_id        --'学校区县id'
+  ,p.area_name   as   org_area_name      --'学校区县id'
+  ,intds                    --原水水质
+  ,case 
+     when intds >=0 and intds <= 10 then '优'
+     when intds >10 and intds <=20 then '良'
+     when intds >20 and intds <=50 then '合格'
+     when intds >50 then '一般'
+   else null end as intds_result   --原水水质结论
+  ,outtds                          --净水水质
+  ,case 
+     when outtds <= 10 then '极佳'
+     when outtds >=11 and outtds <=50 then '优秀'
+     when outtds >=51 and outtds <=300 then '良好'
+     when outtds >=301 and outtds <=600 then '一般'
+     when outtds >600 then '有待改善'
+   else null end as outtds_result   --净水水质结论
+  ,air_exhaust_temp       --温度
+  ,case 
+       when air_exhaust_temp <= 5 then '寒冷'
+       when air_exhaust_temp > 5 and air_exhaust_temp <= 18 then '较冷'
+       when air_exhaust_temp > 18 and air_exhaust_temp <= 28 then '适宜'
+       when air_exhaust_temp > 28 and air_exhaust_temp <= 32 then '较热'
+       when air_exhaust_temp > 32 then '炎热'
+     else null end as air_exhaust_result   --温度结论
+  ,air_exhaust_humidity   --湿度
+  ,case 
+       when air_exhaust_humidity >= 0 and air_exhaust_humidity <= 40 then '干燥'
+       when air_exhaust_humidity > 40 and air_exhaust_humidity <= 75  then '适宜'
+       when air_exhaust_humidity > 75 and air_exhaust_humidity <= 100 then '湿润'
+     else null end as air_exhausthum_result --湿度结论
+  ,co2_value              --CO2
+  ,case 
+       when co2_value >= 0 and co2_value <= 450 then '优'
+       when co2_value > 450 and co2_value <= 800 then '良'
+       when co2_value > 800 and co2_value <= 1200 then '轻度'
+       when co2_value > 1200 and co2_value <= 2000 then '中度'
+       when co2_value > 2000 then '重度'
+     else null end as co2_result   --CO2结论
+  ,pm25_value             --PM2.5
+  ,case 
+       when pm25_value >= 0 and pm25_value <= 35 then '优'
+       when pm25_value > 35 and pm25_value <= 75 then '良'
+       when pm25_value > 75 and pm25_value <= 115 then '轻度'
+       when pm25_value > 115 and pm25_value <= 150 then '中度'
+       when pm25_value > 150 and pm25_value <= 250 then '重度'
+   else null end as pm25_result   --pm25结论  
+  ,g.grade_id  			-- ’年级id'
+  ,g.grade_name         -- '年级名称'
+  ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from
+(
+  select * from dwh_ods_campus_new.clife_campus_ods_class_room
+  where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+) t 
+left join 
+(
+   select 
+        position_id as class_room_id
+       ,upload_time
+       ,avg(air_exhaust_temp) as air_exhaust_temp
+       ,avg(air_exhaust_humidity) as air_exhaust_humidity
+       ,avg(co2_value) as co2_value
+       ,avg(pm25_value) as pm25_value
+   from 
+   ( 
+     select * from dwh_ods_campus_new.clife_campus_ods_fresh_air_machine_run_data 
+     where part_date = regexp_replace(date_sub(current_date(),1),'-','') and substr(upload_time,0,10)=date_sub(current_date(),1)
+   )a 
+   left join
+   ( 
+      select * from dwh_ods_campus_new.clife_campus_ods_school_device 
+      where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+   )b on a.device_no = b.device_no 
+   where b.position_type = 1
+   group by position_id,upload_time
+)c on t.class_room_id=c.class_room_id
+full join
+(
+   select 
+        position_id as class_room_id
+       ,cdate
+       ,avg(intds) as intds
+       ,avg(outtds) as outtds
+   from 
+   ( 
+     select * from dwh_ods_campus_new.clife_campus_ods_water_drink_record 
+     where part_date = regexp_replace(date_sub(current_date(),1),'-','') and substr(create_time,0,10)=date_sub(current_date(),1)
+   )d 
+   left join
+   ( 
+      select * from dwh_ods_campus_new.clife_campus_ods_school_device 
+      where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+   )e on d.device_no = e.device_no 
+   where e.position_type = 1
+   group by position_id,cdate
+)f
+on t.class_room_id = f.class_room_id and c.upload_time=f.cdate
+left join
+(
+  select * from dwh_dw_campus.clife_campus_dim_class
+  where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+)g on t.class_id = g.class_id
+left join
+(
+  select * from dwh_dw_campus.clife_campus_dim_org
+  where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+)k on t.school_id = k.org_id
+left join
+(
+   select * from dwh_dw_campus.clife_campus_dim_area
+)p on p.area_id = k.area_id
+
+
+===========================
+    clife_campus_dwd_student_leave_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_student_leave_info partition(part_date)
+select  
+    b.student_id, --'学生唯一id'
+    b.student_name, --'学生姓名'
+    b.sex,         --'性别'
+    b.age,          --'年龄'
+  	b.class_id,     --'班级id'     
+  	b.class_name,   --'班级名称'
+  	b.grade_id,     --'年级id'
+  	b.grade_name,   --'年级名称'
+  	b.org_id,       --'学校id'
+ 	b.org_name,     --'学校名称'
+  	b.area_id,      --'学校区县id'
+    a.leave_type,     --'类型 2-病假 3-事假'
+	a.leave_reason,   --'请假事由'
+	a.leave_url,      --'病况资料图片'
+	a.leave_duration, --'请假时长天-4-1 '
+	a.start_time,     --'开始时间'
+	a.end_time,       --'结束时间'
+	a.start_time_type, --'请假开始时间类型0-上午1-下午'
+	a.end_time_type,    --'请假结束时间类型0-上午1-下午'
+	a.teacher_data_id,   --'审批老师主键ID'
+	case when a.read_status = 1 then 0 else 1 end,  --'阅读状态0未读1已读'
+	case when a.approve_status = 1 then 0 else 1 end,  --'审批状态0未处理1已处理'
+	a.approve_date,      --'审批时间'
+	a.create_date,       --'创建时间'
+	a.update_date,       --'修改时间'
+	regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from 
+ dwh_ods_campus_new.clife_campus_ods_student_leave a
+ left join 
+ dwh_dw_campus.clife_campus_dim_student b 
+ on a.student_id=b.student_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','') and b.status=1 and b.deleted=1
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') and substr(a.update_date,1,10)=date_sub(current_date(),1)
+
+
+===========================
+    clife_campus_dwd_inspection_stu
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_inspection_stu partition(part_date)
+select
+ t1.inspection_id      -- '晨午检Id'
+,t1.student_id        -- '学生id'
+,t1.student_name      -- '姓名'
+,t1.sex               -- '性别'
+,t1.age               -- '年龄'
+,t1.class_id          -- '班级id'
+,t1.class_name        -- '班级名称'
+,t1.grade_id          -- '年级id'
+,t1.grade_name        -- '年级名称'
+,t1.org_id            -- '学校id'
+,t1.org_name          -- '学校名称'
+,t1.org_area_id       -- '学校县区id'
+,t1.user_id           -- '检查人Id'
+,t1.type              -- '检查类型 0晨检 1午检'
+,t1.img               -- '检查图片'
+,t1.is_temperature    -- '体温 0正常 1具体温度'
+,t1.temperature       -- '体温值(选择具体温度才有值)'
+,substr(cast(t1.inspection_date as string),1,10)  inspection_date   -- '检查日期'
+,t1.is_abnormal       -- '检查结果 0异常 1正常'
+,case when concat(',',symptom_ids,',') like '%,1,%'  then 1 else 0 end fever             -- '发热  1是0否'
+,case when concat(',',symptom_ids,',') like '%,2,%'  then 1 else 0 end throat            -- '咽部红肿'
+,case when concat(',',symptom_ids,',') like '%,3,%'  then 1 else 0 end hfmd              -- '疑似手口足病'
+,case when concat(',',symptom_ids,',') like '%,4,%'  then 1 else 0 end abnormal_rash     -- '异常皮疹'
+,case when concat(',',symptom_ids,',') like '%,5,%'  then 1 else 0 end cough             -- '咳嗽'
+,case when concat(',',symptom_ids,',') like '%,6,%'  then 1 else 0 end runny_nose        -- '流涕'
+,case when concat(',',symptom_ids,',') like '%,7,%'  then 1 else 0 end rash              -- '皮疹'
+,case when concat(',',symptom_ids,',') like '%,8,%'  then 1 else 0 end vomit             -- '呕吐'
+,case when concat(',',symptom_ids,',') like '%,9,%'  then 1 else 0 end conjunctival      -- '结膜充血，分泌物多'
+,case when concat(',',symptom_ids,',') like '%,10,%'  then 1 else 0 end nose_bleeding     -- '流鼻血'
+,case when concat(',',symptom_ids,',') like '%,11,%'  then 1 else 0 end trauma            -- '外伤'
+,case when concat(',',symptom_ids,',') like '%,12,%'  then 1 else 0 end diarrhea          -- '腹泻'
+,case when concat(',',symptom_ids,',') like '%,13,%'  then 1 else 0 end cheek             -- '腮腺肿大' 
+,case when concat(',',symptom_ids,',') like '%,14,%'  then 1 else 0 end hand              -- '手部异常'
+,case when concat(',',symptom_ids,',') like '%,15,%'  then 1 else 0 end mouth             -- '口腔异常'
+,case when concat(',',symptom_ids,',') like '%,16,%'  then 1 else 0 end red_eye           -- '红眼'
+,case when concat(',',symptom_ids,',') like '%,17,%'  then 1 else 0 end spirit            -- '精神不佳'
+,case when concat(',',symptom_ids,',') like '%,18,%'  then 1 else 0 end fingernail        -- '指甲过长'
+,t1.contagion_ids contagions        -- '传染病ids'
+,case when concat(',',contagion_ids,',') like '%,6_1,%'  then 1 else 0 end influenza             -- '流行性感冒'
+,case when concat(',',contagion_ids,',') like '%,6_3,%'  then 1 else 0 end rubella           -- '风疹'
+,case when concat(',',contagion_ids,',') like '%,6_11,%'  then 1 else 0 end contagion_diarrhea            -- '感染性腹泻'
+,case when concat(',',contagion_ids,',') like '%,6_10,%'  then 1 else 0 end contagion_hfmd        -- '手口足病'
+,case when concat(',',contagion_ids,',') like '%,5_12,%'  then 1 else 0 end dysentery            -- '痢疾'
+,case when !(concat(',',contagion_ids,',') like '%,,%' or concat(',',contagion_ids,',') like '%,6_1,%' or concat(',',contagion_ids,',') like '%,6_3,%' or concat(',',contagion_ids,',') like '%,6_11,%' or concat(',',contagion_ids,',')  like '%,6_10,%' or concat(',',contagion_ids,',') like '%,5_12,%')  then 1 else 0 end other_contagions        -- '其他传染病'
+,t1.other_symptom     -- '其他症状'
+,t1.treatment         -- '处理情况 0家长送医 1留园观察 2停课治疗 3其他'
+,t1.other             -- '其他情况'
+,t1.deleted           -- '是否删除 0是 1不是'
+,t1.status            -- '状态 0已确定 1待确认'
+,t1.data_sources      -- '数据来源  0 web录入  1 智能设备 2批量创建 3移动端录入'
+,t1.create_time       -- '创建时间'
+,t1.update_time       -- '修改时间'
+,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from 
+(
+select 
+  a.inspection_id             -- '晨午检Id'
+  ,max(a.student_id)    student_id              -- '学生Id'
+  ,max(t.student_name)  student_name             -- '姓名'
+  ,max(t.sex)           sex                     -- '1-男 2-女 3-其他'
+  ,max(t.age)           age              --  '年龄'
+  ,max(t.class_id)      class_id                 -- '班级id'
+  ,max(t.class_name)    class_name             -- '班级名称'
+  ,max(t.grade_id)      grade_id              -- '年级id'
+  ,max(t.grade_name)    grade_name             -- '年级名称'
+  ,max(t.org_id)        org_id             -- '学校id'
+  ,max(t.org_name)      org_name             -- '学校名称'
+  ,max(t.area_id)      org_area_id             -- '学校区县id'
+  ,max(a.user_id)       user_id            -- '检查人Id'
+  ,max(a.type)          type            -- '检查类型 0晨检 1午检'
+  ,max(a.img)           img            -- '检查图片'
+  ,max(a.is_temperature)    is_temperature        -- '体温 0正常 1具体温度'
+  ,max(a.temperature)       temperature        -- '体温值(选择具体温度才有值)'
+  ,max(a.inspection_date)   inspection_date        -- '检查日期'
+  ,max(a.is_abnormal)       is_abnormal        -- '检查结果 0异常 1正常'
+  ,max(a.other_symptom)     other_symptom        -- '其他症状'
+  ,max(a.treatment)         treatment        -- '处理情况 0家长送医 1留园观察 2停课治疗 3其他'
+  ,max(a.other)             other        -- '其他情况'
+  ,max(a.deleted)           deleted        -- '是否删除 0是 1不是'
+  ,max(a.status)            status        -- '状态 0已确定 1待确认'
+  ,max(a.data_sources)      data_sources        -- '数据来源  0 web录入  1 智能设备 2批量创建 3移动端录入'
+  ,max(a.create_time)       create_time        -- '创建时间'
+  ,max(a.update_time)       update_time        -- '修改时间'
+  ,concat_ws(',',collect_set(cast(b.symptom_id as string))) as symptom_ids   --症状ids
+  ,concat_ws(',',collect_set(concat(cast(c.contagion_type as string),'_',cast(c.contagion_id as string)))) as contagion_ids   --传染病ids
+  from 
+  dwh_ods_campus_new.clife_campus_ods_student_am_inspection a 
+  left join 
+  dwh_dw_campus.clife_campus_dim_student t
+  on a.student_id=t.student_id and t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  left join 
+  dwh_ods_campus_new.clife_campus_ods_student_inspection_symptom b 
+  on a.inspection_id=b.inspection_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  left join 
+  dwh_ods_campus_new.clife_campus_ods_inspection_contagion c 
+  on a.inspection_id=c.inspection_id and c.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  group by a.inspection_id
+)   t1
+
+
+===========================
+    clife_campus_dwd_sports_amount
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_sports_amount partition(part_date)
+select 
+   a.data_id                    -- '主键标识'
+  ,a.student_id                 -- '学生唯一标识'
+  ,b.student_name               -- '姓名'
+  ,b.sex                        -- '1-男 2-女 3-其他'
+  ,b.age                        --  '年龄'
+  ,b.class_id                   -- '班级id'
+  ,b.class_name                 -- '班级名称'
+  ,b.grade_id                   -- '年级id'
+  ,b.grade_name                 -- '年级名称'
+  ,b.org_id                     -- '学校id'
+  ,b.org_name                   -- '学校名称'
+  ,b.area_id                      -- '区县id'
+  ,a.device_no                  -- '设备编号'
+  ,case when a.sport_num  is null then 0 else  a.sport_num end as  sport_num                -- '运动量'
+  ,a.source                     -- '数据来源：1-手环；2-家长APP；3-手表'
+  ,a.measure_time               -- '测量时间'
+  ,a.upload_time               -- '数据上传时间'
+  ,regexp_replace(substr(a.measure_time,0,10),'-','')  as part_date    -- '跑数时间'
+from (
+select * 
+from dwh_ods_campus_new.clife_campus_ods_sport_amount where part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+         and substr(measure_time,0,10) > date_sub(current_date(),10)
+) a 
+left join (
+select 
+ * 
+from dwh_dw_campus.clife_campus_dim_student where part_date > regexp_replace(date_sub(current_date(),10),'-','')
+) b 
+on a.student_id=b.student_id and regexp_replace(substr(a.measure_time,0,10),'-','')=b.part_date and b.status=1 and b.deleted=1
+
+
+===========================
+    clife_campus_dwd_health_stu_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_health_stu_info partition(part_date)
+select
+   e.data_id
+  ,e.student_id                 -- '学生id'
+  ,t.student_name               -- '姓名'
+  ,t.sex                        -- '1-男 2-女 3-其他'
+  ,t.age                        --  '年龄'
+  ,t.class_id                   -- '班级id'
+  ,t.class_name                 -- '班级名称'
+  ,t.grade_id                   -- '年级id'
+  ,t.grade_name                 -- '年级名称'
+  ,t.org_id                     -- '学校id'
+  ,t.org_name                   -- '学校名称'
+  ,t.area_id     -- '区县id'
+  ,e.serious_disease_his     -- '各种严重病史'
+  ,e.serious_disease_his_d      -- '严重病史详情'
+  ,e.infectious_disease_his     -- '各种传染病史'
+  ,e.infectious_disease_his_d   -- '传染病史详情'
+  ,e.weight                     -- '体重（单位：kg）'
+  ,e.`level`                    -- '（身材正常状态）  0：偏瘦  1：标准  2：超重  3：肥胖 99-其它'
+  ,e.height                     -- '身高（单位：cm）'
+  ,e.height_level               -- '（身高状态）  0：偏矮  1：标准  2：偏高'
+  ,e.bmi                        -- 'bmi数值'
+  ,e.bmi_assess                 -- '身材正常状态）  0：偏瘦  1：标准  2：超重  3：肥胖 99-其它'
+  ,e.left_eye                   -- '左眼健康'
+  ,e.right_eye                  -- '右眼健康'
+  ,e.left_vision                -- '左视力'
+  ,e.right_vision               -- '右视力'
+  ,e.left_abnormal        -- '左视力健康'
+  ,e.right_abnormal        -- '右视力健康'
+  ,e.number_of_caries           -- '龋齿数'
+  ,e.number_of_teeth            -- '牙齿数量'
+  ,e.head_neck     -- ' 头颈'
+  ,e.thoracic     -- '胸廓'
+  ,e.spine     -- '脊椎'
+  ,e.limbs     -- '四肢'
+  ,e.pharynx         -- '咽部'
+  ,e.heart     -- '心'
+  ,e.lung     -- '肺'
+  ,e.liver     -- '肝'
+  ,e.spleen     -- '脾'
+  ,e.hemoglobin     -- '血红蛋白（单位：g/h）'
+  ,e.alt     -- '丙氨酸氨基转移酶'
+  ,e.lack     -- '接种情况'
+  ,e.whether_allergy     --'是否过敏体质，0：否，1：是'
+  ,g.allergy_ingredients        -- '过敏食材'
+  ,e.date_time  --测量日期
+  ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from
+(
+  select
+       student_id
+      ,date_time
+      ,serious_disease_his
+      ,serious_disease_his_d
+      ,infectious_disease_his
+      ,infectious_disease_his_d
+      ,left_eye
+      ,right_eye
+      ,number_of_caries
+      ,number_of_teeth
+      ,head_neck
+      ,thoracic
+      ,spine
+      ,limbs
+      ,pharynx
+      ,heart
+      ,lung
+      ,liver
+      ,spleen
+      ,hemoglobin
+      ,alt
+      ,lack
+      ,whether_allergy
+      ,left_vision
+      ,right_vision
+      ,left_abnormal
+      ,right_abnormal
+      ,weight
+      ,level
+      ,height
+      ,height_level
+      ,bmi
+      ,bmi_assess
+      ,row_number()over(order by date_time asc) as data_id
+   from
+   (
+     select
+          student_id
+         ,date_time
+         ,max(serious_disease_his)       as serious_disease_his
+         ,max(serious_disease_his_d)     as serious_disease_his_d
+         ,max(infectious_disease_his)    as infectious_disease_his
+         ,max(infectious_disease_his_d)  as infectious_disease_his_d
+         ,max(left_eye)                  as left_eye
+         ,max(right_eye)                 as right_eye
+         ,max(number_of_caries)          as number_of_caries
+         ,max(number_of_teeth)           as number_of_teeth
+         ,max(head_neck)                 as head_neck
+         ,max(thoracic)                  as thoracic
+         ,max(spine)                     as spine
+         ,max(limbs)                     as limbs
+         ,max(pharynx)                   as pharynx
+         ,max(heart)                     as heart
+         ,max(lung)                      as lung
+         ,max(liver)                     as liver
+         ,max(spleen)                    as spleen
+         ,max(hemoglobin)                as hemoglobin
+         ,max(alt)                       as alt
+         ,max(lack)                      as lack
+         ,max(whether_allergy)           as whether_allergy
+         ,max(left_vision)               as left_vision
+         ,max(right_vision)              as right_vision
+         ,max(left_abnormal)             as left_abnormal
+         ,max(right_abnormal)            as right_abnormal
+         ,max(weight)                    as weight
+         ,max(`level`)                   as level
+         ,max(height)                    as height
+         ,max(height_level)              as height_level
+         ,max(bmi)                       as bmi
+         ,max(bmi_assess)                as bmi_assess
+     from
+     (
+       select 
+            student_data_id as student_id
+           ,serious_disease_his      -- '各种严重病史'
+           ,serious_disease_his_d     -- '严重病史详情'
+           ,infectious_disease_his    -- '各种传染病史'
+           ,infectious_disease_his_d  -- '传染病史详情'
+           ,left_eye                  -- '左眼健康'
+           ,right_eye                 -- '右眼健康'
+           ,number_of_caries          -- '龋齿数'
+           ,number_of_teeth           -- '牙齿数量'
+           ,head_neck  -- ' 头颈'
+           ,thoracic  -- '胸廓'
+           ,spine  -- '脊椎'
+           ,limbs  -- '四肢'
+           ,pharynx  -- '咽部'
+           ,heart  -- '心'
+           ,lung      -- '肺'
+           ,liver  -- '肝'
+           ,spleen  -- '脾'
+           ,hemoglobin  -- '血红蛋白（单位：g/h）'
+           ,alt  -- '丙氨酸氨基转移酶'
+           ,lack      -- '接种情况'
+           ,whether_allergy  --'是否过敏体质，0：否，1：是'
+           ,null as left_vision       -- '左视力'
+           ,null as right_vision      -- '右视力'
+           ,null as left_abnormal     -- '左视力健康'
+           ,null as right_abnormal
+           ,null as weight      
+           ,null as `level`     
+           ,null as height      
+           ,null as height_level
+           ,null as bmi
+           ,null as bmi_assess
+           ,date_time
+       from
+       (
+         select 
+              t1.student_data_id
+             ,concat_ws(',',collect_list(cast(t1.serious_disease_his as string))) as serious_disease_his
+             ,concat_ws(',',collect_list(cast(t1.serious_disease_his_d as string))) as serious_disease_his_d
+             ,concat_ws(',',collect_list(cast(t1.infectious_disease_his as string))) as infectious_disease_his
+             ,concat_ws(',',collect_list(cast(t1.infectious_disease_his_d as string))) as infectious_disease_his_d
+             ,concat_ws(',',collect_list(cast(t1.left_eye as string))) as left_eye
+             ,concat_ws(',',collect_list(cast(t1.right_eye as string))) as right_eye
+             ,concat_ws(',',collect_list(cast(t1.number_of_caries as string))) as number_of_caries
+             ,concat_ws(',',collect_list(cast(t1.number_of_teeth as string))) as number_of_teeth
+             ,concat_ws(',',collect_list(cast(t1.head_neck as string))) as head_neck
+             ,concat_ws(',',collect_list(cast(t1.thoracic as string))) as thoracic
+             ,concat_ws(',',collect_list(cast(t1.spine as string))) as spine
+             ,concat_ws(',',collect_list(cast(t1.limbs as string))) as limbs
+             ,concat_ws(',',collect_list(cast(t1.pharynx as string))) as pharynx
+             ,concat_ws(',',collect_list(cast(t1.heart as string))) as heart
+             ,concat_ws(',',collect_list(cast(t1.lung as string))) as lung
+             ,concat_ws(',',collect_list(cast(t1.liver as string))) as liver
+             ,concat_ws(',',collect_list(cast(t1.spleen as string))) as spleen
+             ,concat_ws(',',collect_list(cast(t1.hemoglobin as string))) as hemoglobin
+             ,concat_ws(',',collect_list(cast(t1.alt as string))) as alt
+             ,concat_ws(',',collect_list(cast(t1.lack as string))) as lack
+             ,concat_ws(',',collect_list(cast(t1.whether_allergy as string))) as whether_allergy
+             ,substr(if(t1.update_time is null,t1.create_time,t1.update_time),1,10) as date_time
+         from dwh_ods_campus.clife_campus_ods_stu_health t1
+         where t1.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+           and t1.status=1 
+           and t1.deleted=1
+         group by t1.student_data_id
+                 ,substr(if(t1.update_time is null,t1.create_time,t1.update_time),1,10)
+       )a
+       union all
+       select 
+            student_id
+           ,null as serious_disease_his      -- '各种严重病史'
+           ,null as serious_disease_his_d     -- '严重病史详情'
+           ,null as infectious_disease_his    -- '各种传染病史'
+           ,null as infectious_disease_his_d  -- '传染病史详情'
+           ,null as left_eye                  -- '左眼健康'
+           ,null as right_eye                 -- '右眼健康'
+           ,null as number_of_caries          -- '龋齿数'
+           ,null as number_of_teeth           -- '牙齿数量'
+           ,null as head_neck  -- ' 头颈'
+           ,null as thoracic  -- '胸廓'
+           ,null as spine  -- '脊椎'
+           ,null as limbs  -- '四肢'
+           ,null as pharynx  -- '咽部'
+           ,null as heart  -- '心'
+           ,null as lung      -- '肺'
+           ,null as liver  -- '肝'
+           ,null as spleen  -- '脾'
+           ,null as hemoglobin  -- '血红蛋白（单位：g/h）'
+           ,null as alt  -- '丙氨酸氨基转移酶'
+           ,null as lack      -- '接种情况'
+           ,null as whether_allergy  --'是否过敏体质，0：否，1：是'
+           ,left_vision                -- '左视力'
+           ,right_vision               -- '右视力'
+           ,left_abnormal     -- '左视力健康'
+           ,right_abnormal
+           ,null as weight      
+           ,null as `level`     
+           ,null as height      
+           ,null as height_level
+           ,null as bmi
+           ,null as bmi_assess
+           ,date_time
+       from
+       (
+          select
+               student_id
+              ,concat_ws(',',collect_list(cast(pl.left_vision as string))) as left_vision
+              ,concat_ws(',',collect_list(cast(pl.right_vision as string))) as right_vision
+              ,concat_ws(',',collect_list(cast(pl.left_abnormal as string))) as left_abnormal
+              ,concat_ws(',',collect_list(cast(pl.right_abnormal as string))) as right_abnormal
+              ,date_time
+          from
+          (
+            select 
+                 student_id
+                ,left_vision                -- '左视力'
+                ,right_vision               -- '右视力'
+                ,case when t1.left_abnormal =0 then 2 else  t1.left_abnormal end left_abnormal     -- '左视力健康'
+                ,case when t1.right_abnormal =0 then 2 else t1.right_abnormal end right_abnormal
+                ,substr(if(measure_time is null,cast(upload_time as date),measure_time),1,10) as date_time
+            from dwh_ods_campus_new.clife_campus_ods_vision_data t1
+            where part_date=regexp_replace(date_sub(current_date(),1),'-','')
+          )pl
+          group by student_id
+                  ,date_time
+       )b
+       union all
+       select 
+            student_id
+           ,null as serious_disease_his      -- '各种严重病史'
+           ,null as serious_disease_his_d     -- '严重病史详情'
+           ,null as infectious_disease_his    -- '各种传染病史'
+           ,null as infectious_disease_his_d  -- '传染病史详情'
+           ,null as left_eye                  -- '左眼健康'
+           ,null as right_eye                 -- '右眼健康'
+           ,null as number_of_caries          -- '龋齿数'
+           ,null as number_of_teeth           -- '牙齿数量'
+           ,null as head_neck  -- ' 头颈'
+           ,null as thoracic  -- '胸廓'
+           ,null as spine  -- '脊椎'
+           ,null as limbs  -- '四肢'
+           ,null as pharynx  -- '咽部'
+           ,null as heart  -- '心'
+           ,null as lung      -- '肺'
+           ,null as liver  -- '肝'
+           ,null as spleen  -- '脾'
+           ,null as hemoglobin  -- '血红蛋白（单位：g/h）'
+           ,null as alt  -- '丙氨酸氨基转移酶'
+           ,null as lack      -- '接种情况'
+           ,null as whether_allergy  --'是否过敏体质，0：否，1：是'
+           ,null as left_vision       -- '左视力'
+           ,null as right_vision      -- '右视力'
+           ,null as left_abnormal     -- '左视力健康'
+           ,null as right_abnormal
+           ,weight      
+           ,`level`     
+           ,height      
+           ,height_level
+           ,bmi
+           ,bmi_assess    
+           ,date_time
+       from
+       (
+          select
+             student_id
+            ,concat_ws(',',collect_list(cast(pl.weight as string)))       as weight
+            ,concat_ws(',',collect_list(cast(pl.level as string)))        as level
+            ,concat_ws(',',collect_list(cast(pl.height as string)))       as height
+            ,concat_ws(',',collect_list(cast(pl.height_level as string))) as height_level
+            ,concat_ws(',',collect_list(cast(pl.bmi as string)))          as bmi
+            ,concat_ws(',',collect_list(cast(pl.bmi_assess as string)))   as bmi_assess
+            ,date_time
+          from
+          (
+            select 
+                 t1.student_id
+                ,t1.weight      
+                ,t1.`level`     
+                ,t1.height      
+                ,t1.height_level
+                ,t1.bmi
+                ,case when t1.bmi< f.value1 then 0 
+                      when t1.bmi>=f.value1 and t1.bmi<f.value3 then 1
+                      when t1.bmi>=f.value3 and t1.bmi<f.value4 then 2
+                      when t1.bmi>=f.value4 then 3
+                 else null end as bmi_assess      
+                ,substr(if(t1.measure_time is null,t1.upload_time,t1.measure_time),1,10) as date_time          
+            from dwh_ods_campus_new.clife_campus_ods_student_body_data t1
+            left join dwh_dw_campus.clife_campus_dim_student t2 on t1.student_id = t2.student_id and t2.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+            left join dwh_ods_campus_new.clife_campus_ods_public_standard_bmi f on t2.sex=f.bmi_sex and t2.age=f.bmi_age and  t2.`month`=f.`month` and f.bmi_type=1 
+            where t1.part_date=regexp_replace(date_sub(current_date(),1),'-','') and t1.status=1
+          )pl
+          group by student_id
+                  ,date_time
+       )c 
+     )d
+     group by student_id
+             ,date_time  
+   )p
+)e 
+left join 
+(
+  select *
+  from dwh_dw_campus.clife_campus_dim_student
+  where part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+    and status=1 
+    and deleted=1
+)t on t.student_id=e.student_id
+left join 
+(
+  select 
+       b1.student_id
+      ,concat_ws(',',collect_list(cast(b1.ingredient_id as string))) as allergy_ingredients 
+  from dwh_ods_campus.clife_campus_ods_student_allergy_ingredients b1 
+  where b1.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+  group by b1.student_id 
+)g on t.student_id=g.student_id
+
+
+===========================
+    clife_campus_dwd_student_medicine_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_medicine_data partition(part_date)
+select 
+    a.data_id                                                  , -- 唯一标识
+    a.medication_date                                          , -- 喂药日期
+    a.whether_inspect                                          , -- 药品是否视检,0:否，1：是
+    a.medication_reasons                                       , -- 用药原因
+    a.number_of_feeding                                        , -- 喂药次数
+    a.deleted                                                  , -- 0：删除，1：正常
+    a.status                                                   , -- 1-待视检、2-已撤销、3-已视检、4-已完成
+    a.source                                                   , -- 0-老师录入，1-家长录入
+    a.update_time                                              , -- 更新时间
+    a.create_time                                              , -- 创建时间
+    a.parent_sign_url                                          , -- 家长签字图片  
+    b.medicine_name_list                                       ,  -- 药物名称                         
+    b.medication_time_list                                     ,  -- 用药时间                         
+    b.medication_method_list                                   ,  -- 用药方式，0：口服，1：外用       
+    b.dosage_list                                              ,  -- 用药剂量                         
+    b.unit_list                                                ,  -- 单位，0：包，1：颗，2：滴，3：ml 
+    b.picture_url_list                                         ,  -- 药物图片url                                    
+    b.uncomplete_medicine_cnt                                  ,  -- 待喂药次数                       
+    b.complete_medicine_cnt                                    ,  -- 已喂药次数                       
+    b.total_cnt                                                ,  -- 总共喂药次数                       
+    b.am_cnt                                                   ,  -- 早上喂药次数                     
+    b.mid_cnt                                                  ,  -- 中午喂药次数
+    c.student_id                                               ,  -- 学生唯一id
+    c.student_name                                             ,  -- 学生姓名
+    c.sex                                                      ,  -- 性别
+    c.age                                                      ,  -- 年龄
+    c.class_id                                                 ,  -- 班级id
+    c.class_name                                               ,  -- 班级名称
+    c.grade_id                                                 ,  -- 年级id
+    c.grade_name                                               ,  -- 年级名称
+    c.org_id                                                   ,  -- 学校id
+    c.org_name                                                 ,  -- 学校名称
+    c.area_id                                                  ,  -- 学校区县id
+    case when d.am_status is null then 0 else d.am_status end  am_status   ,      -- '是否入园'
+    regexp_replace(a.medication_date,'-','')                   ,  -- 喂药分区日期，（等同于喂药日期）  
+    regexp_replace(date_sub(current_date(),1),'-','')  as part_date    -- 跑数日期
+from dwh_ods_campus.clife_campus_ods_medicine a
+left join (
+  select 
+    feeding_id                                                                                            ,  -- 喂药id
+    concat_ws(',',collect_list(cast(medicine_name        as string)))   as        medicine_name_list      ,  -- 药物名称                                       
+    concat_ws(',',collect_list(cast(medication_time      as string)))   as        medication_time_list    ,  -- 用药时间                                       
+    concat_ws(',',collect_list(cast(medication_method    as string)))   as        medication_method_list  ,  -- 用药方式，0：口服，1：外用                     
+    concat_ws(',',collect_list(cast(dosage               as string)))   as        dosage_list             ,  -- 用药剂量                                       
+    concat_ws(',',collect_list(cast(unit                 as string)))   as        unit_list               ,  -- 单位，0：包，1：颗，2：滴，3：ml               
+    concat_ws(',',collect_list(cast(picture_url          as string)))   as        picture_url_list        ,  -- 药物图片url                                                                  
+    sum(case medication_status when 0 then 1 else 0 end)                as        uncomplete_medicine_cnt ,  -- 待喂药次数                                   
+    sum(case medication_status when 1 then 1 else 0 end)                as        complete_medicine_cnt   ,  -- 已喂药次数   
+    count(*)                                                            as        total_cnt               ,     -- 总共喂药次数
+    sum(case moment when 0 then 1 else 0 end)                           as        am_cnt                  ,  -- 早上喂药次数                                   
+    sum(case moment when 1 then 1 else 0 end)                           as        mid_cnt                    -- 中午喂药次数
+  from dwh_ods_campus.clife_campus_ods_medicine_details 
+  where part_date = regexp_replace(date_sub(current_date(),1),'-','') and status = 1 
+  --    and substr(medication_time,0,10) = date_sub(current_date(),1)
+  group by feeding_id
+) b
+on a.data_id = b.feeding_id 
+left join dwh_dw_campus.clife_campus_dim_student c 
+on a.student_id = c.student_id 
+        and c.deleted=1 and c.status=1 and c.part_date = regexp_replace(date_sub(current_date(),1),'-','')
+left join dwh_dw_campus.clife_campus_dim_into_campus_detail d 
+on c.student_id=d.student_id 
+        and d.part_date=regexp_replace(date_sub(current_date(),1),'-','') and d.am_status = 1 and d.data_time=date_sub(current_date(),1)
+where a.deleted = 1 and a.part_date = regexp_replace(date_sub(current_date(),1),'-','') and a.medication_date = date_sub(current_date(),1)  
+union all 
+select 
+    data_id                                                  , -- 唯一标识
+    medication_date                                          , -- 喂药日期
+    whether_inspect                                          , -- 药品是否视检,0:否，1：是
+    medication_reasons                                       , -- 用药原因
+    number_of_feeding                                        , -- 喂药次数
+    deleted                                                  , -- 0：删除，1：正常
+    status                                                   , -- 1-待视检、2-已撤销、3-已视检、4-已完成
+    source                                                   , -- 0-老师录入，1-家长录入
+    update_time                                              , -- 更新时间
+    create_time                                              , -- 创建时间
+    parent_sign_url                                          , -- 家长签字图片  
+    medicine_name_list                                       ,  -- 药物名称                         
+    medication_time_list                                     ,  -- 用药时间                         
+    medication_method_list                                   ,  -- 用药方式，0：口服，1：外用       
+    dosage_list                                              ,  -- 用药剂量                         
+    unit_list                                                ,  -- 单位，0：包，1：颗，2：滴，3：ml 
+    picture_url_list                                         ,  -- 药物图片url                                    
+    uncomplete_medicine_cnt                                  ,  -- 待喂药次数                       
+    complete_medicine_cnt                                    ,  -- 已喂药次数                       
+    total_cnt                                                ,  -- 总共喂药次数                       
+    am_cnt                                                   ,  -- 早上喂药次数                     
+    mid_cnt                                                  ,  -- 中午喂药次数
+    student_id                                               ,  -- 学生唯一id
+    student_name                                             ,  -- 学生姓名
+    sex                                                      ,  -- 性别
+    age                                                      ,  -- 年龄
+    class_id                                                 ,  -- 班级id
+    class_name                                               ,  -- 班级名称
+    grade_id                                                 ,  -- 年级id
+    grade_name                                               ,  -- 年级名称
+    org_id                                                   ,  -- 学校id
+    org_name                                                 ,  -- 学校名称
+    area_id                                                  ,  -- 学校区县id
+    am_status                                                ,  -- '是否入园'
+    medication_part_date                                     ,  -- 喂药分区日期，（等同于喂药日期）  
+    regexp_replace(date_sub(current_date(),1),'-','')  as part_date    -- 跑数日期
+from dwh_dw_campus.clife_campus_dwd_medicine_data aas
+where part_date = regexp_replace(date_sub(current_date(),2),'-','')
+
+
+===========================
+    clife_campus_dwd_push_message_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_push_message_info partition(part_date)
+select
+     a.data_id         --   '自增主键'
+    ,a.user_id         --   '用户id'
+    ,a.user_name       --   '用户名
+    ,a.student_id      --   '学生id'
+    ,a.student_name    --   '学生名称'
+    ,a.message_id      --   '消息id'
+    ,b.app_name        --   '应用名称'
+    ,b.title           --   '标题'
+    ,b.summary         --   '概要，简单描述'
+    ,b.sender          --   '发送者(系统发送的sender为0)'
+    ,b.message_type    --   '消息类型'
+    ,b.business_param  --   '业务参数的值json格式'
+    ,b.content_type    --   '消息内容类型(0 - 富文本方式; 1 - 跳转消息)'
+    ,b.data_flag       --   '数据来源标识（默认为0-普通推送消息；1-园丁端老师；2-校园运营端）'   
+    ,a.status          --   '消息状态（0-删除，1-未读，2-已读）'
+    ,a.org_id          --   '机构id'
+    ,a.org_name        --   '学校名称'
+    ,a.grade_id        --   '年级集合'
+    ,a.grade_name      --   '年级名称集合'
+    ,a.class_id        --   '班级集合'
+    ,a.class_name      --   '班级名称集合'
+    ,a.user_type       --   '用户类型'
+    ,a.create_time     --   '创建时间'
+    ,a.update_time     --   '更新时间'
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from 
+(
+  select
+       t.data_id         --   '自增主键'
+      ,t.user_id         --   '用户id'
+      ,t1.user_name      --   '用户名'
+      ,t.student_id      --   '学生id'
+      ,null as student_name 
+      ,t.org_id          --   '机构id'
+      ,t.message_id      --   '消息id'
+      ,t.status          --   '消息状态（0-删除，1-未读，2-已读）'
+      ,t.user_type       --   '2-家长'
+      ,t.create_time     --   '创建时间'
+      ,t.update_time     --   '更新时间'
+      ,t1.org_name       --   '学校名称'
+      ,t1.grade_id_list   as grade_id    --   '年级集合'
+      ,t1.grade_name_list as grade_name  --   '年级名称集合'
+      ,t1.class_id_list   as class_id    --   '班级集合'
+      ,t1.class_name_list as class_name  --   '班级名称集合'
+  from dwh_ods_campus.clife_campus_ods_message_user t
+  left join 
+  (
+    select 
+         user_id
+        ,org_id
+        ,concat_ws(';',collect_list(cast(a.class_id as string))) as class_id_list
+        ,concat_ws(';',collect_list(cast(b.class_name as string))) as class_name_list
+        ,concat_ws(';',collect_list(cast(b.grade_id as string))) as grade_id_list
+        ,concat_ws(';',collect_list(cast(b.grade_name as string))) as grade_name_list
+        ,max(b.org_name) as org_name -- '学校名称'
+        ,max(c.real_name) as user_name
+    from dwh_ods_campus.clife_campus_ods_user_class a
+    left join dwh_dw_campus.clife_campus_dim_class b on a.org_id = b.org_id and a.class_id = b.class_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+    left join dwh_ods_campus.clife_campus_ods_user c on a.user_id=c.user_id and c.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+    where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+    group by a.user_id,a.org_id
+  )t1 on t.org_id = t1.org_id and t.user_id = t1.user_id
+  where (t.user_type = 1 or t.user_type = 3) and t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  union all
+  select
+       t3.data_id         -- '自增主键'
+      ,t3.user_id         -- '用户id'
+      ,null as user_name  -- '用户名称'
+      ,t3.student_id      -- '学生id'
+      ,t4.student_name    -- '名称'
+      ,t3.org_id          -- '机构id'
+      ,t3.message_id      -- '消息id'
+      ,t3.status          -- '消息状态（0-删除，1-未读，2-已读）'
+      ,t3.user_type       -- '2-家长'
+      ,t3.create_time     -- '创建时间'
+      ,t3.update_time     -- '更新时间'
+      ,t4.org_name        -- '学校名称'
+      ,cast(t4.grade_id   as string) as grade_id      -- '年级id'
+      ,cast(t4.grade_name as string) as grade_name    -- '年级名称'
+      ,cast(t4.class_id   as string) as class_id      -- '班级id'
+      ,cast(t4.class_name as string) as class_name    -- '班级名称'
+  from dwh_ods_campus.clife_campus_ods_message_user t3
+  left join dwh_dw_campus.clife_campus_dim_student t4 on t3.student_id = t4.student_id and t4.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  where t3.user_type = 2 and t3.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+)a
+left join dwh_ods_campus.clife_campus_ods_message b on a.message_id = b.message_id and b.status=1 and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dwd_student_shit_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_student_shit_info partition(part_date)
+select
+     b.date_id
+    ,b.student_id      --'学生唯一标识'
+    ,a.student_name      --'学生名称'
+    ,a.sex             --'性别'
+    ,a.age             --'年龄'
+    ,a.class_id        --'班级id'     
+    ,a.class_name      --'班级名称'
+    ,a.grade_id        --'年级id'
+    ,a.grade_name      --'年级名称'
+    ,a.org_id          --'学校id'
+    ,a.org_name        --'学校名称'
+    ,a.area_id         --'学校区县id'
+    ,b.device_no       --'设备编号'
+    ,b.shit_cnt        --拉臭臭次数
+    ,b.card_times      --'刷卡时间(本地)'
+    ,b.length_times    --'多次间隔时长'
+    ,c.am_status       --'入园状态'
+    ,c.att_status      --'考勤入园状态'
+    ,b.date_time       --'上传日期'
+    ,regexp_replace(date_sub(current_date(),1),'-','')  as part_date     --'数据日期'
+from 
+(
+   select
+        student_id
+       ,device_no
+       ,shit_cnt
+       ,card_times
+       ,length_times
+       ,date_time
+       ,row_number()over(order by date_time asc) as date_id
+   from
+   (
+     select 
+          student_id
+         ,max(device_no) as device_no
+         ,count(1) as shit_cnt --次数
+         ,concat_ws(',',collect_list(cast(t.card_time as string)))   as card_times
+         ,concat_ws(',',collect_list(cast(t.length_time as string)))   as length_times
+         ,date_time  --天数
+     from
+     (
+        select
+             student_id
+            ,device_no
+            ,substr(upload_time,1,10) as date_time
+            ,card_time
+            ,coalesce(CAST((unix_timestamp(card_time) - unix_timestamp(lag(card_time, 1, null) over (partition by student_id order by card_time))) % 60 AS int),0) as length_time --多次上厕所的间隔时长(秒)
+        from dwh_ods_campus.clife_campus_ods_shit_card_data 
+        where part_date = regexp_replace(date_sub(current_date(),1),'-','') 
+          and status = 1
+     )t
+     group by student_id
+             ,date_time
+   )p
+)b 
+left join  dwh_ods_campus.clife_campus_ods_into_campus_detail c on c.student_id = b.student_id and c.part_date=regexp_replace(date_sub(current_date(),1),'-','') and c.data_time=b.date_time
+left join dwh_dw_campus.clife_campus_dim_student a on b.student_id = a.student_id
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  and a.status=1 and a.deleted=1
+
+
+===========================
+    clife_campus_dwd_student_intocampus_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dwd_student_intocampus_info partition(part_date)
+select
+    b.record_id      --入园记录
+   ,b.student_id   --学生id
+   ,a.student_name --'学生姓名'
+   ,a.sex          --'性别'
+   ,a.age          --'年龄'
+   ,a.class_id     --'班级id'     
+   ,a.class_name   --'班级名称'
+   ,a.grade_id     --'年级id'
+   ,a.grade_name   --'年级名称'
+   ,a.org_id       --'学校id'
+   ,a.org_name     --'学校名称'
+   ,a.area_id      --'学校区县id'
+   ,b.am_status    --'入园状态'
+   ,b.att_status   --'考勤入园状态'
+   ,b.am_time      --'入园时间'
+   ,b.`type`       --'条件类型'
+   ,b.create_time  --'创建时间'
+   ,b.value        --'数据值'
+   ,b.data_time    --日期
+   ,regexp_replace(date_sub(current_date(),1),'-','') as part_date --日期
+from dwh_ods_campus_new.clife_campus_ods_into_campus_detail b 
+left join  dwh_dw_campus.clife_campus_dim_student a on a.student_id=b.student_id and a.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+where b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+ and a.status=1 and a.deleted=1
+ and b.data_time <=date_sub(current_date(),1)
+
+

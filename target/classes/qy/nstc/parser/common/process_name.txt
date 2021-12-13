@@ -1,0 +1,5 @@
+db_ods_nstc
+db_dwd_nstc
+db_dws_nstc
+db_ads_nstc
+db_dim_nstc

@@ -1,0 +1,456 @@
+===========================
+    clife_campus_dim_org
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_org partition(part_date)
+select 
+   org_id 				--'机构id'
+  ,org_name 				--'机构名称'
+  ,domain_name 			--'机构专属域名'
+  ,admin_user_id 		--'机构管理员的用户id'
+  ,parent_id 			--'上级机构id,0表示没有上级机构'
+  ,org_type 				--'机构类型( 1:教育局 2:教育集团 3:幼儿园)'
+  ,grade_ids 			--'幼儿园开设年级,以英文逗号隔开'
+  ,org_code 				--'机构代码'
+  ,status 				--'状态(-1:未开始 0:停用 1：正常 2：过期)'
+  ,deleted 				--'删除状态 0已删除 1正常'
+  ,create_time 			--'创建时间'
+  ,update_time 			--'更新时间'
+  ,start_date 			--'使用期限的开始时间'
+  ,end_date 				--'使用期限的结束时间'
+  ,logo 					--'logo图标路径'
+  ,province_id 			--'省份id'
+  ,city_id 				--'城市id'
+  ,area_id 				--'区县id'
+  ,province_city_area 	--'省市区'
+  ,address 				--'详细地址',
+  ,fixed_tel_area_num 	--'固定电话-区号'
+  ,fixed_tel_num 		--'固定电话号码'
+  ,phone_num 			--'联系手机'
+  ,part_date
+from dwh_ods_campus_new.clife_campus_ods_org t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_class
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_class partition(part_date)
+select 
+   a.class_id 				-- '班级id',
+  ,a.class_no 				-- '班级编号'
+  ,a.class_name 			-- '班级名称'
+  ,a.grade_id  			-- ’年级id'
+  ,a.grade_name 			-- '年级名称'
+  ,a.org_id 				-- '学校id'
+  ,b.org_name 				-- '学校名称'
+  ,c.class_room_id 		-- '教室id'
+  ,a.status  				-- '班级状态（0-失效 1-正常 2-毕业）'
+  ,a.enter_school_year 	-- '入学年份'
+  ,a.leave_date 			-- '毕业离园日期'
+  ,a.graduation_time 		-- '毕业处理时间'
+  ,a.create_time 			-- '添加时间'
+  ,a.update_time 			-- '修改时间'
+  ,a.part_date
+from dwh_ods_campus_new.clife_campus_ods_class a 
+left join dwh_ods_campus_new.clife_campus_ods_org b 
+on a.org_id = b.org_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+left join dwh_ods_campus_new.clife_campus_ods_class_room c 
+on a.class_id=c.class_id and c.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_grade
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_grade partition(part_date)
+select 
+     grade_id          -- '年级id'
+  ,a.grade_name        -- '年级名称'
+  ,a.org_id            -- '学校id'
+  ,b.org_name          -- '学校名称'
+  ,a.grade_order       -- '年级排序'
+  ,a.create_time       -- '添加时间'
+  ,a.update_time       -- '修改时间'
+  ,a.part_date
+from dwh_ods_campus_new.clife_campus_ods_grade a 
+left join dwh_ods_campus_new.clife_campus_ods_org b 
+on a.org_id = b.org_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_student
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_student partition(part_date)
+select
+   a.student_id             -- '学生id'
+  ,a.student_name           -- '姓名'
+  ,a.org_id                 -- '学校id'
+  ,b.org_name                 -- '学校名称'
+  ,c.grade_id               -- '年级id'
+  ,c.grade_name             -- '年级名称'
+  ,a.class_id               -- '班级id'
+  ,c.class_name             -- '班级名称'
+  ,a.parent_name            -- '家长姓名'
+  ,a.student_no             -- '学号'
+  ,a.sex                    -- '1-男 2-女 3-其他'
+  ,a.birthday               -- '出生日期'
+  ,if(datediff(CURRENT_DATE,CONCAT(substr(CURRENT_DATE,0,4),substr(a.birthday,5,7)))>=0,
+  (substr(CURRENT_DATE,0,4) - substr(a.birthday,0,4)),
+  (substr(CURRENT_DATE,0,4) - substr(a.birthday,0,4)-1)) as age                    --  '年龄(虚岁)'
+  ,if(datediff(CURRENT_DATE,CONCAT(substr(CURRENT_DATE,0,4),substr(a.birthday,5,7)))>=0,(substr(CURRENT_DATE,6,2) - substr(a.birthday,6,2)),(substr(CURRENT_DATE,6,2) - substr(a.birthday,6,2)+11))   as `month`    --月份 
+  ,a.card_no                -- '身份证号码'
+  ,a.home_address           -- '家庭地址'
+  ,a.enter_school_date      -- '入学日期'
+  ,a.status                 -- '学生状态（0-停用 1-正常 2-毕业 3-结业）'
+  ,a.deleted                -- '删除 0-已删除 1-正常'
+  ,a.create_time            -- '创建时间'
+  ,a.update_time            -- '修改时间'
+  ,a.card_type              -- '证件类型'
+  ,a.nation                 -- '民族'
+  ,a.avatar                 -- '头像'
+  ,a.`user_id`              -- '关联家长用户id'
+  ,a.province_id            -- '省份id'
+  ,a.city_id                -- '城市id'
+  ,a.area_id                -- '区县id'
+  ,a.province_city_area     -- '省市区'
+  ,a.part_date
+from dwh_ods_campus_new.clife_campus_ods_student a 
+left join dwh_ods_campus_new.clife_campus_ods_org b
+on a.org_id = b.org_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+left join dwh_ods_campus_new.clife_campus_ods_class c
+on a.class_id = c.class_id and c.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_interest_map_location
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_interest_map_location partition(part_date)
+select
+ map_location_id       -- '活动位置编号'
+,map_id                -- '地图编号'
+,org_id                -- '机构id'
+,coordinates           -- '所在地图的位置坐标'
+,location_name         -- '活动位置名称'
+,`function`            -- '位置使用功能'
+,status                -- '状态'
+,create_time           -- '创建时间'
+,update_time           -- '更新时间'
+,`type`                -- '类型'
+,class_room_id         -- '教室唯一标识'
+,class_id              -- '班级唯一标识'
+,number_people         -- '限定人数'
+,areas_id              -- '公共区域ID'
+,part_date
+from dwh_ods_campus_new.clife_campus_ods_interest_map_location t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_disposition_tag
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_disposition_tag partition(part_date)
+select 
+  tag_id             -- '标签id,自增'
+  ,tag_name           -- '标签名'
+  ,mood_type          -- '人格id'
+  ,disposition_type   -- '特性id'
+  ,case when is_negative=2 then 1 
+        when is_negative=1 then 0 
+        else null end as is_negative		-- '是否负面 0-不是 1-是 (冗余字段)'
+  ,score              -- '标签分值'
+  ,status             -- '状态 0-无效 1-草稿 2-正式'
+  ,create_time        -- '创建时间'
+  ,update_time        -- '更新时间'
+  ,part_date
+from dwh_ods_campus_new.clife_campus_ods_disposition_tag t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_staff_archives
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_staff_archives partition(part_date)
+select
+     a.data_id            --'自增主键'
+    ,a.archives_id        --'档案id(同用户id)'
+    ,b.real_name          --'昵称'
+    ,b.sex                --'性别'
+    ,if(datediff(CURRENT_DATE,CONCAT(substr(CURRENT_DATE,0,4),substr(b.birthday,5,7)))>=0,
+    (substr(CURRENT_DATE,0,4) - substr(b.birthday,0,4)),
+    (substr(CURRENT_DATE,0,4) - substr(b.birthday,0,4)-1)) as age --年龄
+    ,b.mobile             --'手机'
+    ,b.email              --'邮箱'
+    ,b.id_card_type       --'证件类型'
+    ,b.id_card            --'证件号码'
+    ,b.birthday           --'生日'
+    ,a.avatar                       --'头像'
+    ,b.nation                       --'民族'
+    ,b.political_status             --'政治面貌'
+    ,b.education                    --'最高学历'
+    ,c.item_text as education_desc  --'学历描述'
+    ,e.class_ids            --'班级id'
+    ,e.class_names          --'班级名称'
+    ,e.grade_ids            --'年级id'
+    ,e.grade_names          --'年级名称'
+    ,a.org_id             --'机构id'
+    ,e.org_name           --'学校名称'
+    ,b.province_id        --'省份id'
+    ,b.city_id            --'城市id'
+    ,b.area_id            --'区县id'
+    ,b.province_city_area --'省市区'
+    ,b.address            --'详细地址'
+    ,b.clife_id           --'公共平台的用户id'
+    ,a.position_id        --'岗位id'
+    ,d.position_name      --'岗位名称'
+    ,a.dept_id            --'部门id'
+    ,a.staff_type         --'人员类型(1-教师，2-教职工)'
+    ,a.entry_date         --'入职日期'
+    ,a.status             --'状态（0-停用 1-正常）'
+    ,a.change_type        --'异动类型（1-在职,2-离职,3-辞退,4-外部调转,5-退休）'
+    ,a.create_time        --'创建时间'
+    ,a.update_time        --'修改时间'
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from dwh_ods_campus.clife_campus_ods_staff_archives a
+left join dwh_dw_campus.clife_campus_dim_user b on b.user_id = a.archives_id and b.status=1 and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+left join dwh_dw_campus.clife_campus_dim_system_dict_item c on b.education = c.item_value and c.dict_id=22
+left join dwh_dw_campus.clife_campus_dim_position d on a.position_id = d.position_id and  d.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+left join 
+(
+  select 
+       user_id
+      ,org_id
+      ,concat_ws(',',collect_list(cast(a.class_id as string)))   as class_ids
+      ,concat_ws(',',collect_list(cast(b.class_name as string))) as class_names
+      ,concat_ws(',',collect_list(cast(b.grade_id as string)))   as grade_ids
+      ,concat_ws(',',collect_list(cast(b.grade_name as string))) as grade_names
+      ,max(b.org_name) as org_name -- '学校名称'
+  from dwh_ods_campus.clife_campus_ods_user_class a
+  left join dwh_dw_campus.clife_campus_dim_class b on a.org_id = b.org_id and a.class_id = b.class_id and b.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  where a.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+  group by a.user_id
+          ,a.org_id
+)e on a.archives_id = e.user_id and a.org_id = e.org_id
+where a.part_date=regexp_replace(date_sub(current_date(),1),'-','') 
+  and a.deleted=1
+
+
+===========================
+    clife_campus_dim_ingredients_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_ingredients_info partition(part_date)
+select 
+   ingredient_id          -- '编号'
+  ,ingredient_name        -- '食材名称'
+  ,total_category_id      -- '大分类ID'
+  ,first_category_id      -- '一级分类ID'
+  ,second_category_id     -- '二级分类ID'
+  ,description            -- '营养描述'
+  ,edible_part            -- '可食部（%）'
+  ,water_content          -- '水分'
+  ,energy                 -- '能量(Kcal)'
+  ,protein                -- '蛋白质(g)'
+  ,fat                    -- '脂肪(g)'
+  ,carbohydrate           -- '碳水化合物(g)'
+  ,insoluble_fiber        -- '不溶性纤维素(g)'
+  ,total_vitaminA         -- '总维生素A(ugRAE)'
+  ,vitaminB1              -- '维生素B1(mg)'
+  ,vitaminB2              -- '维生素B2(mg)'
+  ,nick_acid              -- '尼克酸(mg)'
+  ,vitaminC               -- '维生素C(mg)'
+  ,calcium                -- '钙(mg)'
+  ,iron                   -- '铁(mg)'
+  ,zinc                   -- '锌(mg)'
+  ,status                 -- '状态：0-无效；1-有效'
+  ,create_time            -- '创建时间'
+  ,update_time            -- '修改时间'
+  ,is_recommend           -- '是否推荐（1-是；2-否）'
+  ,is_allergy             -- '1过敏食材0不是'
+  ,ingredient_alias       -- '食材别名'
+  ,url                    -- '食材图片url'
+  ,is_common              -- '跟大数据食材库是否相交：1-相交;null-不相交'
+  ,part_date
+from dwh_ods_campus_new.clife_campus_ods_ingredients_info t
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_interest_activity
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_interest_activity partition(part_date)
+select 
+     activity_id     --'活动id'
+    ,activity_name   --'活动名称'
+    ,start_time      --'开始时间'
+    ,end_time        --'结束时间'
+    ,org_id          --'学校id'
+    ,class_id        --'班级Id'
+    ,week            --'日期'
+    ,status          --'状态'
+    ,create_time     --'创建时间'
+    ,update_time     --'更新时间'
+    ,part_date
+from dwh_ods_campus_new.clife_campus_ods_interest_activity t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_water_drink_setting
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_water_drink_setting partition(part_date)
+select 
+     data_id       --'唯一标识id'
+    ,org_id        --'机构'
+    ,grade_id      --'年级'
+    ,enough        --'饮水量充足'
+    ,standard      --'饮水量达标'
+    ,device_type   --'饮水设备类型'
+    ,detail        --'明细设置'
+    ,create_time   --'创建时间'
+    ,update_time   --'修改时间'
+    ,deleted       --'是否删除 0-删除 1-正常'
+    ,part_date
+from dwh_ods_campus_new.clife_campus_ods_water_drink_setting t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+===========================
+    clife_campus_dim_sports_assess_setting
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_sports_assess_setting partition(part_date)
+select 
+     data_id       --'唯一标识id'
+    ,org_id        --'机构'
+    ,grade_id      --'年级'
+    ,adequate      --'饮水量充足'
+    ,standard      --'饮水量达标'
+    ,insufficient   --'不足'
+    ,create_time   --'创建时间'
+    ,update_time   --'修改时间'
+    ,part_date
+from dwh_ods_campus_new.clife_campus_ods_sports_assess_setting t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+
+===========================
+    clife_campus_dim_into_campus_detail
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_into_campus_detail partition(part_date)
+select 
+    record_id
+	,org_id
+	,student_id
+	,data_time 
+	,am_status 
+	,am_time
+	,`type` 
+	,create_time
+    ,part_date
+from dwh_ods_campus_new.clife_campus_ods_into_campus_detail t 
+where t.part_date=regexp_replace(date_sub(current_date(),1),'-','')
+
+
+
+===========================
+    clife_campus_dim_system_dict_item
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_system_dict_item
+select
+     dict_id      --'字典id'
+    ,item_text    --'字典项文本'
+    ,item_value   --'字典项值'
+    ,description  --'描述'
+    ,show_order   --'排序'
+    ,create_time  --'创建时间'
+    ,update_time  --'更新时间' 
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from dwh_ods_campus.clife_campus_ods_system_dict_item
+where deleted = 1
+
+
+===========================
+    clife_campus_dim_user
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_user partition(part_date)
+select
+     `user_id`	        --'用户id'
+    ,username	        --'账号'
+    ,real_name	        --'昵称'
+    ,sex	            --'性别'
+    ,if(datediff(CURRENT_DATE,CONCAT(substr(CURRENT_DATE,0,4),substr(birthday,5,7)))>=0,
+    (substr(CURRENT_DATE,0,4) - substr(birthday,0,4)),
+    (substr(CURRENT_DATE,0,4) - substr(birthday,0,4)-1)) as age --年龄
+    ,mobile	            --'手机'
+    ,email	            --'邮箱'
+    ,id_card_type	    --'证件类型'
+    ,id_card	        --'证件号码'
+    ,birthday	        --'生日'
+    ,nation	            --'民族'
+    ,political_status	--'政治面貌'
+    ,education	        --'最高学历'
+    ,province_id	    --'省份id'
+    ,city_id	        --'城市id'
+    ,area_id	        --'区县id'
+    ,province_city_area	--'省市区'
+    ,address	        --'详细地址'
+    ,clife_id	        --'公共平台的用户id'
+    ,status	            --'正常状态'
+    ,create_time	    --'创建时间'
+    ,update_time	    --'更新时间'
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from dwh_ods_campus.clife_campus_ods_user
+where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+  and deleted = 1
+
+
+===========================
+    clife_campus_dim_position
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_position partition(part_date)
+select
+     position_id	
+    ,org_id		
+    ,position_name	    
+    ,create_time	
+    ,update_time
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from  dwh_ods_campus.clife_campus_ods_position
+where part_date = regexp_replace(date_sub(current_date(),1),'-','')
+  and deleted=1
+
+
+===========================
+    clife_campus_dim_geographic_info
+===========================
+insert overwrite table dwh_dw_campus.clife_campus_dim_geographic_info partition(part_date) 
+select 
+     a.area_id	                           --县级市、区id
+    ,a.area_name	                       --县级市、区名称
+    ,a.city_id	                           --城市id
+    ,b.baidu_city_code	                   --百度城市编码
+    ,b.city_name	                       --城市名称
+    ,b.city_english_name	               --城市英文名称
+    ,b.longitude	as  city_longitude     --城市经度
+    ,b.latitude	as  city_latitude          --城市纬度
+    ,b.is_capital                          --是否为省会城市
+    ,b.province_id	                       --省份id
+    ,c.province_name	                   --省份名称
+    ,c.province_english_name               --省份英文名
+    ,c.longitude	as province_longitude  --省份经度
+    ,c.latitude	as province_latitude       --省份纬度
+    ,c.baidu_code                          --省份百度编码
+    ,d.partition_id                        --县级市、区id
+    ,d.partition_name                      --县级市、区名称
+    ,d.country_id                          --国家id
+    ,e.country_name                        --国家名称
+    ,e.country_en_name                     --国家英文名
+    ,regexp_replace(date_sub(current_date(),1),'-','') as part_date
+from dwh_ods_campus.clife_campus_ods_area a
+left join dwh_ods_campus.clife_campus_ods_city  b on a.city_id = b.city_id
+left join dwh_ods_campus.clife_campus_ods_province c on  b.province_id = c.province_id
+left join dwh_ods_campus.clife_campus_ods_partition d on  c.partition_id = d.partition_id
+left join dwh_ods_campus.clife_campus_ods_country e on  d.country_id = e.country_id
+
+
