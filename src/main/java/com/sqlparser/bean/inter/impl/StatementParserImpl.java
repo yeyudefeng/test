@@ -12,6 +12,7 @@ import com.sqlparser.bean.inter.StatementParser;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 解析select类
@@ -56,7 +57,7 @@ public abstract class StatementParserImpl implements StatementParser {
         TableName tableName2 = parseTableName(sqlExprTableSource, permission);
         addTableName(tableName2);
     }
-    public void parseSQLExprTableSourceList(ArrayList<SQLExprTableSource> list, Permission permission){
+    public void parseSQLExprTableSourceList(List<SQLExprTableSource> list, Permission permission){
         for (SQLExprTableSource sqlExprTableSource : list){
             parseSQLExprTableSource(sqlExprTableSource, Permission.READ);
         }

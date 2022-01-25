@@ -1,4 +1,4 @@
-package com.sqlparser.bean.inter.impl;
+package com.sqlparser.bean.inter.impl.tbdata;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
@@ -13,13 +13,14 @@ import com.sqlparser.bean.DatabaseName;
 import com.sqlparser.bean.FieldName;
 import com.sqlparser.bean.Permission;
 import com.sqlparser.bean.TableName;
+import com.sqlparser.bean.inter.impl.StatementParserImpl;
 
 import java.util.ArrayList;
 
 /**
  * 删除表数据sql
  */
-public class DeleteStatementParser extends StatementParserImpl{
+public class DeleteStatementParser extends StatementParserImpl {
     private SQLDeleteStatement sqlDeleteStatement; // insert table
 
     public DeleteStatementParser(SQLDeleteStatement sqlDeleteStatement) {

@@ -1,4 +1,4 @@
-package com.sqlparser.bean.inter.impl;
+package com.sqlparser.bean.inter.impl.tbdata;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
@@ -6,13 +6,14 @@ import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.sqlparser.DatabaseNameParser;
 import com.sqlparser.bean.Permission;
+import com.sqlparser.bean.inter.impl.StatementParserImpl;
 
 import java.util.ArrayList;
 
 /**
  * 更新表数据sql。
  */
-public class UpdateStatementParser extends StatementParserImpl{
+public class UpdateStatementParser extends StatementParserImpl {
     private SQLUpdateStatement sqlUpdateStatement;
     public UpdateStatementParser(SQLUpdateStatement sqlUpdateStatement) {
         this.sqlUpdateStatement = sqlUpdateStatement;

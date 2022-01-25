@@ -6,7 +6,6 @@ import com.alibaba.druid.sql.ast.statement.*;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class DatabaseNameParser {
     private ArrayList<SQLExprTableSource> list = new ArrayList<>();

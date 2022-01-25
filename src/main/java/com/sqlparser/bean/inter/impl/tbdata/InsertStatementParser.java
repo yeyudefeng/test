@@ -1,10 +1,11 @@
-package com.sqlparser.bean.inter.impl;
+package com.sqlparser.bean.inter.impl.tbdata;
 
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.sqlparser.DatabaseNameParser;
 import com.sqlparser.bean.Permission;
+import com.sqlparser.bean.inter.impl.StatementParserImpl;
 
 import java.util.ArrayList;
 

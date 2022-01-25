@@ -1,15 +1,16 @@
-package com.sqlparser.bean.inter.impl;
+package com.sqlparser.bean.inter.impl.db;
 
 import com.alibaba.druid.sql.ast.SQLName;
 import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement;
 import com.sqlparser.PermissionUtils;
 import com.sqlparser.bean.DatabaseName;
 import com.sqlparser.bean.Permission;
+import com.sqlparser.bean.inter.impl.StatementParserImpl;
 
 /**
  * 创建数据库sql
  */
-public class CreateDatabaseStatementParser extends StatementParserImpl{
+public class CreateDatabaseStatementParser extends StatementParserImpl {
     private SQLCreateDatabaseStatement sqlCreateDatabaseStatement;
     public CreateDatabaseStatementParser(SQLCreateDatabaseStatement sqlCreateDatabaseStatement) {
         this.sqlCreateDatabaseStatement = sqlCreateDatabaseStatement;
