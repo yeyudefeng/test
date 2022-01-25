@@ -1,0 +1,18 @@
+druid.driverClassName=com.mysql.jdbc.Driver
+druid.url=jdbc:mysql://10.6.14.1:3306/db_bigdataplatform
+druid.username=root
+druid.password=123456
+#初始化连接数量
+druid.initialSize=1
+#最大连接数
+druid.maxActive=2
+#最大等待时间
+druid.maxWait=60000
+druid.timeBetweenEvictionRunsMillis=60000
+druid.minEvictableIdleTimeMillis=300000
+druid.validationQuery=SELECT 1
+druid.testWhileIdle=true
+druid.testOnBorrow=false
+druid.testOnReturn=false
+druid.poolPreparedStatements=false
+druid.maxPoolPreparedStatementPerConnectionSize=200

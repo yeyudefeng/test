@@ -1,0 +1,6 @@
+alter table a.order_info rename to a.order_info_1;
+alter table a.order_info change column money money_1 double;
+alter table aaa drop partition(part_date = '22');
+CREATE DATABASE player;
+
+DROP DATABASE player;
