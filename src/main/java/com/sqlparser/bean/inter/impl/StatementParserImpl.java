@@ -11,7 +11,6 @@ import com.sqlparser.bean.TableName;
 import com.sqlparser.bean.inter.StatementParser;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

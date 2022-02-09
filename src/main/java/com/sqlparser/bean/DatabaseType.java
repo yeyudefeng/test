@@ -8,6 +8,7 @@ public enum DatabaseType {
     PRESTO(3,"presto"),
     ES(4,"es"),
     FLINK(5,"flink"),
+    SPARK(6,"spark"),
     ;
 
     DatabaseType(Integer index, String type) {
