@@ -1,77 +1,48 @@
 package com.sqlparser.bean.inter.impl;
 
-import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
-import com.sqlparser.PermissionUtils;
-import com.sqlparser.PrintUtils;
-import com.sqlparser.SplitUtils;
-import com.sqlparser.bean.DatabaseName;
-import com.sqlparser.bean.FieldName;
-import com.sqlparser.bean.Permission;
-import com.sqlparser.bean.TableName;
+import com.sqlparser.bean.utils.PermissionUtils;
+import com.sqlparser.bean.bean.DatabaseName;
+import com.sqlparser.bean.bean.FieldName;
+import com.sqlparser.bean.bean.TableName;
 import com.sqlparser.bean.inter.StatementParser;
-import org.apache.commons.lang.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * 解析select类
  */
 public abstract class StatementParserImpl implements StatementParser {
-    @Override
-    public DatabaseName parseDatabase(SQLExprTableSource tableSource, Permission permission) {
-        if (tableSource !=null && !StringUtils.isBlank(tableSource.toString())){
-            //db.tb || tb
-            String db = SplitUtils.getLeft(tableSource.toString());
-            if (!StringUtils.isBlank(db)){
-                return new DatabaseName(db, PermissionUtils.getPermissionSet(permission));
-            }
-        } else {
-            PrintUtils.printMethodName(tableSource);
-        }
-        return null;
-    }
-
-    @Override
-    public TableName parseTableName(SQLExprTableSource tableSource, Permission permission) {
-        if (tableSource !=null && !StringUtils.isBlank(tableSource.toString())){
-            //db.tb || tb
-            String tb = SplitUtils.getRight(tableSource.toString());
-            if (!StringUtils.isBlank(tb)){
-                return new TableName(tb, PermissionUtils.getPermissionSet(permission));
-            }
-        } else {
-            PrintUtils.printMethodName(tableSource);
-        }
-        return null;
-    }
-
-    @Override
-    public FieldName parseFieldName() {
-        return null;
-    }
-
-    public void parseSQLExprTableSource(SQLExprTableSource sqlExprTableSource, Permission permission){
-        DatabaseName databaseName2 = parseDatabase(sqlExprTableSource, permission);
-        addDatabaseName(databaseName2);
-        TableName tableName2 = parseTableName(sqlExprTableSource, permission);
-        addTableName(tableName2);
-    }
-    public void parseSQLExprTableSourceList(List<SQLExprTableSource> list, Permission permission){
-        for (SQLExprTableSource sqlExprTableSource : list){
-            parseSQLExprTableSource(sqlExprTableSource, Permission.READ);
-        }
-    }
-
+    public HashMap<String, DatabaseName> databaseNameMap = new HashMap<>();
+    public HashMap<String, TableName> tableNameMap = new HashMap<>();
+    public HashMap<String, FieldName> fieldNameMap = new HashMap<>();
 
     public void addDatabaseName(DatabaseName databaseName){
+        if (databaseName == null){
+            return;
+        }
         DatabaseName dbn = databaseNameMap.getOrDefault(databaseName.getDatabaseName(), new DatabaseName(databaseName.getDatabaseName(), PermissionUtils.getEmptyPermissionSet()));
         dbn.getPermissionSet().addAll(databaseName.getPermissionSet());
         databaseNameMap.put(dbn.getDatabaseName(), dbn);
     }
 
     public void addTableName(TableName tableName){
+        if (tableName == null){
+            return;
+        }
         TableName tbn = tableNameMap.getOrDefault(tableName.getTableName(), new TableName(tableName.getTableName(), PermissionUtils.getEmptyPermissionSet()));
         tbn.getPermissionSet().addAll(tableName.getPermissionSet());
         tableNameMap.put(tbn.getTableName(), tbn);
+    }
+
+    public void addDatabaseName(List<DatabaseName> databaseNameList){
+        for (DatabaseName databaseName : databaseNameList){
+            addDatabaseName(databaseName);
+        }
+    }
+    public void addTableName(List<TableName> tableNameList){
+        for (TableName tableName : tableNameList){
+            addTableName(tableName);
+        }
     }
 }
